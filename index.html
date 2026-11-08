@@ -374,7 +374,7 @@ const fmt = n => n.toLocaleString('ja-JP');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm = s => s.normalize('NFKC').toLowerCase().replace(/\s+/g, '');
 const sum = a => a.reduce((s, x) => s + x.amount, 0);
-/* 柱の色（hino-portal DESIGN.md 3.6。附表の5つの柱は第6次総合計画の5つの政策と名前と順が同じ）。面は --portal-pillarN、文字は --portal-pillarN-ink */
+/* 柱の色（hino-portal DESIGN.md 3.6。附表の5つの柱は第6次総合計画の5つの柱と名前と順が同じ）。面は --portal-pillarN、文字は --portal-pillarN-ink */
 const pcol = no => 'var(--portal-pillar' + no + ')';
 const pink = no => 'var(--portal-pillar' + no + '-ink)';
 const pno = no => '<span class="pno" style="color:' + pink(no) + ';border-color:' + pcol(no) + '">柱' + no + '</span>';
