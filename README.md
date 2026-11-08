@@ -11,6 +11,7 @@ https://kken78.github.io/hino-budget/
 | ファイル | 中身 |
 |---|---|
 | `index.html` | 画面。`data.js` を読むだけで、外部の CSS・JavaScript・フォントは読み込まない |
+| `DESIGN.md` | 画面の設計の決定（ADR） |
 | `inputs.lock.json` | 材料のファイルごとの、リポジトリ・コミット・パス・sha256（3リポジトリ・23ファイル） |
 | `data/totals-r3.json` 〜 `data/totals-r8.json` | 各年度の当初予算の会計ごとの予算規模（千円）。各年度の「当初予算の概要」の「予算の規模」の表から転記した正本で、出典の URL・バイト数・sha256・ページ・取得日と、hino-town-docs の台帳の id（`docs_id`）も持つ |
 | `data.js` | 材料から作る画面用のファイル。直接編集しない |
@@ -30,6 +31,10 @@ https://kken78.github.io/hino-budget/
 | [hino-ronten](https://github.com/kken78/hino-ronten) | `links/fuhyo.tsv` | 令和8年度の附表の事業と実施計画の事業の対応の台帳（書式は LINK_SCHEMA.md） |
 | | `links/fuhyo-years.tsv` | 附表の事業の年度をまたぐ対応の台帳（LINK_SCHEMA.md「年度の台帳」、DESIGN.md ADR-33） |
 | [hino-town-docs](https://github.com/kken78/hino-town-docs) | `data/sources.tsv` | 町の公開資料の台帳（`yosan-r3-gaiyou` 〜 `yosan-r8-gaiyou` の行で、当初予算の概要の URL・バイト数・sha256 を確かめる） |
+
+## 共通の部品
+
+`index.html` の共通の見出し・分野のナビ・ページの一覧・フッターと、その CSS は、[hino-portal](https://github.com/kken78/hino-portal) の `shared/` の正本の写しで、`<!-- portal-shared:〈名前〉 start/end -->` で囲んでいます（DESIGN.md ADR-1）。正本と同じかは `python3 ../hino-portal/shared/check.py index.html` で確かめ、GitHub Actions（`check.yml`）でも確かめます。
 
 ## 作り直し方
 

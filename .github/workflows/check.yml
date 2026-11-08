@@ -76,3 +76,10 @@ jobs:
             echo "::error::data.js が材料から作り直した結果と一致しません。python3 tools/build_data.py を実行してコミットしてください。"
             exit 1
           fi
+
+      # 共通の部品（見出し・分野のナビ・ページの一覧・フッター）は hino-portal の shared/ の写し（DESIGN.md ADR-1）
+      - name: 共通の部品が hino-portal の正本と同じか
+        working-directory: hino-budget
+        run: |
+          git clone --depth 1 https://github.com/kken78/hino-portal.git /tmp/hino-portal
+          python3 /tmp/hino-portal/shared/check.py index.html
