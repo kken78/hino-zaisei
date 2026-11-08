@@ -444,8 +444,8 @@ const pname = no => (B.pillars.find(p => p.no === no) || {}).name || '';
 const Y = {}; YEARS.forEach(y => { Y[y.fy] = y; });
 const townPage = y => 'https://www.town.shiga-hino.lg.jp/' + String(y.source.page_id).padStart(10, '0') + '.html';
 const ymd = s => { const a = s.split('-').map(Number); return a[0] + '年' + a[1] + '月' + a[2] + '日'; };
-/* 増減の書き方（hino-portal DESIGN.md 3.3。矢印と文言。色は付けない） */
-const diffText = (cur, prev) => prev == null ? '－' : cur > prev ? '▲ ' + fmt(cur - prev) + '千円 増' : cur < prev ? '▼ ' + fmt(prev - cur) + '千円 減' : '＝ 同額';
+/* 増減の書き方（hino-portal DESIGN.md 3.3。負の値に △、正に印なし、向きは文言。色は付けない） */
+const diffText = (cur, prev) => prev == null ? '－' : cur > prev ? fmt(cur - prev) + '千円 増' : cur < prev ? '△' + fmt(prev - cur) + '千円 減' : '0 同額';
 ALL.forEach((it, i) => { it._i = i; it._hay = norm([it.name, it.desc, it.details.join(' '), it.dept.join(' ')].join(' ')); });
 /* 年度をまたぐ束（chain 番号 → 年度ごとの事業） */
 const CH = {};
@@ -743,7 +743,7 @@ const TD_BLOB = 'https://github.com/kken78/hino-town-docs/blob/' + KZ.commit + '
 const docA = (r, text) => r.url ? '<a href="' + esc(r.url + (r.page ? '#page=' + r.page : '')) + '" target="_blank" rel="noopener">' + text + '</a>' : text;
 /* 決算の円を、表示のために千円に四捨五入する（data.js には円だけを持つ） */
 const sen = yen => Math.round(yen / 1000);
-const hoseiText = v => v > 0 ? '▲ ' + fmt(v) + '千円 増' : v < 0 ? '▼ ' + fmt(-v) + '千円 減' : '＝ 同額';
+const hoseiText = v => v > 0 ? fmt(v) + '千円 増' : v < 0 ? '△' + fmt(-v) + '千円 減' : '0 同額';
 const GOU = n => '第' + n + '号';
 let KY = KZ.years[KZ.years.length - 1].fy;
 const kyBox = document.getElementById('kyYears');
@@ -816,7 +816,7 @@ function zDiff(cur, prev, unit){
   const d = Number(cur) - Number(prev), k = Math.max(dec(cur), dec(prev));
   const u = unit === '％' ? 'ポイント' : unit;
   const t = x => unit === '千円' ? fmt(x) : x.toFixed(k);
-  return d > 0 ? '▲ ' + t(d) + u + ' 増' : d < 0 ? '▼ ' + t(-d) + u + ' 減' : '＝ 増減なし';
+  return d > 0 ? t(d) + u + ' 増' : d < 0 ? '△' + t(-d) + u + ' 減' : '0 増減なし';
 }
 function spark(v){
   const W = 96, H = 32, p = 3, n = v.length, a = v.map(Number), mn = Math.min(...a), mx = Math.max(...a);
