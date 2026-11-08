@@ -1,5 +1,5 @@
 {
-  "note": "tools/build_data.py が読む材料。各リポジトリを git pull したあとの HEAD で固定した（2026-11-06。附表の検収の完了と読みの注の版に上げた）。材料は、このリポジトリと同じフォルダに置いた各リポジトリから読む。",
+  "note": "tools/build_data.py が読む材料。各リポジトリを git pull したあとの HEAD で固定した（2026-11-06。附表の検収の完了と読みの注の版に上げた）。hino-town-docs は 2026-11-08 に構造化の層（data/struct/）を足し、data/sources.tsv も同じ commit に上げた（CI はリポジトリごとに commit を1つだけ取り出すため）。材料は、このリポジトリと同じフォルダに置いた各リポジトリから読む。",
   "inputs": [
     {
       "repo": "kken78/shiga-hino-plans",
@@ -135,9 +135,81 @@
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1de9d46eef7797274de0f6c7e0d40347f77ed4f",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
       "path": "data/sources.tsv",
-      "sha256": "4c2257a6a4c85ee19cecc80d58b659182bc10f61efe595ab25c60179027070f0"
+      "sha256": "f92f56792075d4ceb91a1dc6135a892ec6974e2d99dbc4867c1914b1252ef22b"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/hosei-kai.tsv",
+      "sha256": "4446a850d45e3fb18a79a4b683461acb7cd68146e629d99acfc79da22c76538a"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/hosei-shiryo.tsv",
+      "sha256": "e66543e6e1eccf2c8bf2b2e3f948316f82e0985940a9592babe86f5ed856ce8d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/hosei-kan.tsv",
+      "sha256": "7da8fdcb98fae079c29384949172b9ccad23621c76ba795113617e57a3a8ae97"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/hosei-kaikei.tsv",
+      "sha256": "04c296eccc2929950e6d1101345d892604fd4afb0d9a1490a1bd422f1180f083"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/kessan-kai.tsv",
+      "sha256": "dd48805f89b3e01e66895d6a20252cfb96d71f2fda21cb8dfe3a7c59337270b5"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/kessan-gaku.tsv",
+      "sha256": "87ac605546971474ff3ffe02f8d5ef8422a6bb95c9dd4c9bb407bf6b56555ccf"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/zaisei-shihyo.tsv",
+      "sha256": "0d119454ccad14b44229951f6c02fc4f386004e4eb2e9631acc36bcb5b1e9dbd"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/zaisei-ichi.tsv",
+      "sha256": "752ba0a1002fda1600bb53e1d00122cd6ae9404aae65b1823dff99fd0ab4204a"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/audit/hosei-r6.tsv",
+      "sha256": "43a724c91327e7c8a15be7a25137bdef003631de6f23e5d9c5b192ba36e3f6f1"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/audit/kessan.tsv",
+      "sha256": "f76323aa88920cf3be681242917206b4c481c1733236970d77442b67e33ba6c6"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/audit/zaisei.tsv",
+      "sha256": "baeadcf416b332aabb005ef35256aec948d98c618b0fa16e914153eb3da6bc1a"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "fc252320d4789a610765360d6c64ee3649086998",
+      "path": "data/struct/issues/yosan-r6-hosei-09.tsv",
+      "sha256": "f625ca1f1a2a479594203e04336e9e19903e1ca23f022193c665b874be8995d4"
     }
   ]
 }
