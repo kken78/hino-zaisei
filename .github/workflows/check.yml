@@ -2,6 +2,8 @@
 # プルリクエストと main への push のたびに、inputs.lock.json の commit の材料で
 # tools/build_data.py を実行し、作り直した data.js がコミットされたものと一致するかを確かめる。
 # 材料は shiga-hino-plans・hino-ronten・hino-town-docs の3リポジトリ。
+# hino-town-docs からは、台帳 data/sources.tsv と構造化の層 data/struct/（補正予算・決算・財政指標。DESIGN.md ADR-4）を読む。
+# CI はリポジトリごとに commit を1つだけ取り出すので、lock の同じリポジトリのファイルは同じ commit にそろえる。
 # あわせて、hino-portal の shared/ の検査（共通の部品、文字の大きさ、幅 360px と 1024px での実寸）を走らせる。
 name: check
 
@@ -65,6 +67,18 @@ jobs:
           repository: kken78/hino-town-docs
           ref: ${{ steps.lock.outputs.towndocs }}
           path: hino-town-docs
+
+      - name: lock の材料のファイルがそろっているか
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          lock = json.load(open('hino-budget/inputs.lock.json', encoding='utf-8'))
+          miss = [f"{i['repo']} {i['path']}" for i in lock['inputs']
+                  if not os.path.isfile(os.path.join(i['repo'].split('/')[1], i['path']))]
+          if miss:
+              sys.exit('lock の commit に無いファイル: ' + ', '.join(miss))
+          print(f"lock の {len(lock['inputs'])}ファイルがそろっている")
+          PY
 
       - name: 材料の検算と data.js の作り直し(build_data.py)
         working-directory: hino-budget
