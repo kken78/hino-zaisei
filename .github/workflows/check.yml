@@ -2,6 +2,7 @@
 # プルリクエストと main への push のたびに、inputs.lock.json の commit の材料で
 # tools/build_data.py を実行し、作り直した data.js がコミットされたものと一致するかを確かめる。
 # 材料は shiga-hino-plans・hino-ronten・hino-town-docs の3リポジトリ。
+# あわせて、hino-portal の shared/ の検査（共通の部品、文字の大きさ、幅 360px と 1024px での実寸）を走らせる。
 name: check
 
 on:
@@ -78,8 +79,21 @@ jobs:
           fi
 
       # 共通の部品（見出し・分野のナビ・ページの一覧・フッター）は hino-portal の shared/ の写し（DESIGN.md ADR-1）
-      - name: 共通の部品が hino-portal の正本と同じか
+      # 文字の大きさは hino-portal DESIGN.md 5.2（DESIGN.md ADR-3）
+      - name: 共通の部品と文字の大きさ（hino-portal の shared/check.py）
         working-directory: hino-budget
         run: |
           git clone --depth 1 https://github.com/kken78/hino-portal.git /tmp/hino-portal
-          python3 /tmp/hino-portal/shared/check.py index.html
+          python3 /tmp/hino-portal/shared/check.py --fonts index.html
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: 実ブラウザでの文字の大きさと横のはみ出し（hino-portal の shared/check_mobile.mjs）
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw
+          npm install --no-save --no-package-lock playwright@1.49.1
+          npx playwright install --with-deps chromium
+          cd "$GITHUB_WORKSPACE/hino-budget"
+          PLAYWRIGHT_MODULE=/tmp/pw/node_modules/playwright/index.mjs node /tmp/hino-portal/shared/check_mobile.mjs index.html
