@@ -33,3 +33,15 @@ hino-budget（当初予算 主な事業）の画面の設計の決定を記録�
 - ページの CSS のトークン `--shu`（朱）は使うところが無くなったので消す。
 - フォーカスの印を、朱の線から、共通の部品と同じ黄色と黒の二重の線にする（hino-portal DESIGN.md 3.2 の 3）。
 - 文字の大きさとグラフの描き方は変えない（段階3以降）。
+
+### ADR-3 文字の大きさを hino-portal DESIGN.md 5.2 に合わせる
+
+決定 2026-11-08。hino-portal DESIGN.md 9.2 の段階3による。
+
+- 文字の大きさは、共通の部品のトークン5つ（`--portal-fs-sub` 14px、`--portal-fs` 16px、`--portal-fs-h1` 18px、`--portal-fs-h3` 20px、`--portal-fs-h2` 24px）だけを使う。14px より小さい文字は作らない。
+- ページのトークン `--fs-*` は名前を残し、値を5つのどれかの参照にする。`--fs-3xs`・`--fs-2xs`・`--fs-xs` は 14px、`--fs-sm`・`--fs-base` は 16px、`--fs-md` は 18px、`--fs-lg`・`--fs-h2` は 20px、`--fs-xl`・`--fs-h1` は 24px。狭い画面の上書きで小さくしない。
+- 直接の指定をやめる。柱ごとの推移のグラフ（SVG）の文字の 12.5px は `--fs-xs`（14px）に、狭い画面の数値カードの数字の 1.25rem は `--fs-lg`（20px）にする。
+- `<small>` をやめる。数値カードと事業の一覧の単位（件・千円）は `span.u`、原典との照合の表の補いは `span.sm` にし、どちらもトークンで大きさを決める。
+- 共通の部品の CSS を hino-portal の shared/shell.css（`--portal-fs-h3` を足した版）から写し直す。
+- 幅が足りない箇所は、文字を小さくせずに配置で解く（shiga-hino-plans DESIGN.md ADR-8 の表）。柱ごとの推移のグラフでは、縦軸の単位「億円」が一番上の目盛り「30」と重なっていた（12.5px で 1px、14px で 3px）。グラフの上の余白を 24px から 34px に、高さを 190px から 200px にし、単位を目盛りより上に置いた。表の見出しや事業の一覧の行は、14px にしても枠から出ない（hino-portal-work の段階3の前の調べ）。
+- CI（`.github/workflows/check.yml`）で、hino-portal の `shared/check.py --fonts`（静的検査）と `shared/check_mobile.mjs`（幅 360px と 1024px での実寸の検査）を走らせる。
