@@ -394,7 +394,7 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <p>補正予算の額の単位は千円です。決算の額は、決算審査意見書の円の額を、表示のために千円に四捨五入しています。原典の円の額は、千円の値の下に添えています。</p>
 <p id="kyGenko"></p>
 <p>決算の事業ごとの数字（主要な施策の成果を説明する書類など）は町のサイトに公開されていないため、事業の単位の決算は載せていません。決算は会計の単位までです。</p>
-<p>年度の中の動きは、令和3〜8年度です。決算は決算審査意見書のある令和3〜7年度だけで、令和8年度は取り込んだ補正予算の回までです。最初に開く年度は、決算まである一番新しい年度です。会計は、その年度の補正予算の概要の特別会計の表・企業会計の表にあるものです（令和3・4年度は簡易水道特別会計と農業集落排水事業特別会計を含みます）。</p>
+<p>年度の中の動きは、令和3〜8年度です。決算は決算審査意見書のある令和3〜7年度だけで、令和8年度は取り込んだ補正予算の回までです。最初に開く年度は、構造化の層のある一番新しい年度（いま動いている年度）です。会計は、その年度の補正予算の概要の特別会計の表・企業会計の表にあるものです（令和3・4年度は簡易水道特別会計と農業集落排水事業特別会計を含みます）。</p>
 <p>財政指標の総括表の値は普通会計の値で、上の一般会計の決算の額とは範囲が違います。</p></div>
 <div class="card"><h3>材料の版</h3>
 <p>このページは、次のリポジトリの決まった版の材料から作っています。当初予算の総額と会計ごとの額は、このリポジトリで原典の PDF の文字とページの画像に照らして転記し、会計ごとの額の和が合計と合うことと、出典の URL・バイト数・sha256 が hino-town-docs の台帳と合うことを確かめています。</p>
@@ -745,8 +745,8 @@ const docA = (r, text) => r.url ? '<a href="' + esc(r.url + (r.page ? '#page=' +
 /* 決算の円を、表示のために千円に四捨五入する（data.js には円だけを持つ） */
 const sen = yen => Math.round(yen / 1000);
 const GOU = n => '第' + n + '号';
-/* 最初に開く年度は、決算まである一番新しい年度（DESIGN.md ADR-6） */
-let KY = (KZ.years.filter(y => y.kessan_doc).pop() || KZ.years[KZ.years.length - 1]).fy;
+/* 最初に開く年度は、構造化の層のある一番新しい年度（DESIGN.md ADR-6。2026-11-09 に改めた） */
+let KY = Math.max(...KZ.years.map(y => y.fy));
 const kyBox = document.getElementById('kyYears');
 kyBox.insertAdjacentHTML('beforeend', KZ.years.map(y => '<button type="button" data-ky="' + y.fy + '" aria-pressed="false">' + esc(y.label) + '</button>').join(''));
 kyBox.addEventListener('click', e => { const b = e.target.closest('[data-ky]'); if (b) { KY = Number(b.dataset.ky); drawKy(); } });
