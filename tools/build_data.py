@@ -11,12 +11,12 @@
                     links/fuhyo-years.tsv               附表の事業の年度をまたぐ対応（LINK_SCHEMA.md「年度の台帳」）
   hino-town-docs    data/sources.tsv                    町の公開資料の台帳（yosan-r<n>-gaiyou の行で、当初予算の概要の
                                                         url・bytes・sha256 を確かめる）
-                    data/struct/hosei-kai.tsv・hosei-shiryo.tsv・hosei-kan.tsv・hosei-kaikei.tsv
-                                                        補正予算の回・回と資料・款の表・会計の額（DOCS_SCHEMA.md §13.6）
+                    data/struct/hosei-kai.tsv・hosei-shiryo.tsv・hosei-kan.tsv・hosei-kaikei.tsv・hosei-maru.tsv
+                                                        補正予算の回・回と資料・款の表・会計の額・主な内容の行（DOCS_SCHEMA.md §13.6）
                     data/struct/kessan-kai.tsv・kessan-gaku.tsv  決算の回と額（§13.7）
                     data/struct/zaisei-shihyo.tsv・zaisei-ichi.tsv  財政指標と値の位置（§13.8）
-                    data/struct/audit/hosei-r6.tsv・kessan.tsv・zaisei.tsv  構造化の層の検収の台帳（§13.10）
-                    data/struct/issues/yosan-r6-hosei-09.tsv  原典の誤りの記録（§13.11）
+                    data/struct/audit/hosei-r<n>.tsv・kessan.tsv・zaisei.tsv  構造化の層の検収の台帳（§13.10）
+                    data/struct/issues/yosan-r5-hosei-02.tsv など4つ  補正予算の原典の誤りの記録（§13.11。HOSEI_ISSUES）
 このリポジトリ   data/totals-r<n>.json                 当初予算の会計ごとの予算規模（原典から転記した正本）
 
 材料は、このリポジトリと同じフォルダにある各リポジトリ（例 ../shiga-hino-plans）から読む。
@@ -44,18 +44,20 @@
         つないで束ねた1本の中に、同じ年度の事業が2つ無い
   6. data/totals-r<n>.json: 単位が千円で、会計ごとの和が合計と一致し、出典の title・url・bytes・sha256 が
      hino-town-docs の台帳の yosan-r<n>-gaiyou の行と一致し、pdf_page・printed_page がある
-  7. 構造化の層（hino-town-docs data/struct/。KOZO_YEARS の年度。DESIGN.md ADR-4）
+  7. 構造化の層（hino-town-docs data/struct/。KOZO_YEARS の年度。DESIGN.md ADR-4・ADR-6）。検算は年度ごとに同じものを通す
      a. hino-town-docs の材料が1つの commit。使う行（款の行・会計の額・決算の額・財政指標の値）が、検収の台帳に
         同じ照合キー（§13.10）であり、✓ で、要人確認が残っていない
      b. 回: 会計ごとに prev をたどると、年度の回が1本につながる
      c. 款の表: 回ごとに、款・区分の和＝合計、内訳の和＝親の行、歳入合計＝歳出合計（目的別）＝歳出合計（性質別）、
-        2つめの列＋今回補正額＝補正後予算額（総額と一般財源）、当初予算額が回で同じ。回のつながり（前の回の補正後予算額＝
-        次の回の2つめの列）は、合わない行が原典の誤りの記録で「原典のまま持つ」の行だけなら通し、件数を表示する
+        2つめの列＋今回補正額＝補正後予算額（総額と一般財源）、当初予算額が回で同じ、回のつながり（前の回の補正後予算額＝
+        次の回の2つめの列）
      d. 会計の額: 会計の和＝合計、2つめの列＋今回補正額＝補正後予算額、会計ごとのつながり、当初予算額が資料で同じ。
-        特別会計・企業会計の回が、その会計の補正のある資料と1対1に対応する
+        特別会計・企業会計の回が、その会計の補正のある資料と1対1に対応する。金額が空の主な内容の行の回（繰越明許費のみ）は、
+        その行が検収済みで、説明に「繰越明許費のみ」があり、会計の額の今回補正額が 0
+        c・d で合わない値は、原典の誤りの記録で「原典のまま持つ」とされた行のものだけなら通し、年度ごとに件数を表示する
      e. 当初予算: 一般会計の最初の回の補正前の額、特別会計の表の当初の合計、企業会計の表の支出の当初の和（収益的＋資本的）が、
-        data/totals-r<n>.json の一般会計・特別会計・企業会計の額と同じ
-     f. 決算: 決算審査意見書の円の額で、歳入総額−歳出総額＝歳入歳出差引額（介護保険特別会計は勘定ごと）
+        data/totals-r<n>.json の一般会計・特別会計・企業会計の額と同じ。表の無い区分は、その区分の回も無いこと
+     f. 決算（その年度の決算審査意見書の行がある年度だけ。ある年度は出す会計のすべてにそろう）: 決算審査意見書の円の額で、歳入総額−歳出総額＝歳入歳出差引額（介護保険特別会計は勘定ごと）
      g. 財政指標: 載せる9指標が10年そろう（抜けた年度は表示して止める）。財政比較分析表の当該団体の値＝総括表の値
 どれかが合わなければ data.js を書かずに終了コード 1 で止まる。
 """
@@ -484,10 +486,15 @@ if errors:
 
 # 7. 構造化の層（hino-town-docs data/struct/。DOCS_SCHEMA.md §13。DESIGN.md ADR-4） -----------------
 TD = 'hino-town-docs/data/struct/'
+KOZO_YEARS = [3, 4, 5, 6, 7, 8]
+# 原典の誤りの記録（§13.11）のうち補正予算のもの。「原典のまま持つ」の行だけ、検算で合わなくても通す
+HOSEI_ISSUES = ['issues/yosan-r5-hosei-02.tsv', 'issues/yosan-r6-hosei-09.tsv', 'issues/yosan-r7-hosei-09.tsv',
+                'issues/yosan-r8-hosei-06-tsuika.tsv']
+HOSEI_AUDIT = [f'audit/hosei-r{y}.tsv' for y in KOZO_YEARS]
 KZ = {n: TD + n for n in (
-    'hosei-kai.tsv', 'hosei-shiryo.tsv', 'hosei-kan.tsv', 'hosei-kaikei.tsv', 'kessan-kai.tsv', 'kessan-gaku.tsv',
-    'zaisei-shihyo.tsv', 'zaisei-ichi.tsv', 'audit/hosei-r6.tsv', 'audit/kessan.tsv', 'audit/zaisei.tsv',
-    'issues/yosan-r6-hosei-09.tsv')}
+    'hosei-kai.tsv', 'hosei-shiryo.tsv', 'hosei-kan.tsv', 'hosei-kaikei.tsv', 'hosei-maru.tsv', 'kessan-kai.tsv',
+    'kessan-gaku.tsv', 'zaisei-shihyo.tsv', 'zaisei-ichi.tsv', *HOSEI_AUDIT, 'audit/kessan.tsv', 'audit/zaisei.tsv',
+    *HOSEI_ISSUES)}
 for tag in KZ.values():
     if tag not in files:
         errors.append(f'lock: {tag} が inputs.lock.json に載っていない')
@@ -504,13 +511,16 @@ if errors:
 AMT9 = ['tosho', 'tosho_ippan', 'mae', 'mae_ippan', 'hosei', 'hosei_ippan', 'hoseigo', 'hoseigo_ippan', 'taitosho']
 AMT8 = AMT9[:8]
 C4 = ['tosho', 'mae', 'hosei', 'hoseigo']
-ACC_ORDER = ['ippan', 'kokuho', 'kaigo', 'koki', 'nishiyama', 'suido', 'gesuido']
-ACC_NAME = {'ippan': '一般会計', 'kokuho': '国民健康保険特別会計', 'kaigo': '介護保険特別会計', 'koki': '後期高齢者医療特別会計',
+# 会計の並びは補正予算の概要の特別会計の表・企業会計の表の順（令和3・4年度は簡易水道・農業集落排水事業の特別会計がある。DOCS_SCHEMA §13.3・§13.12）
+ACC_ORDER = ['ippan', 'kokuho', 'kansui', 'noshu', 'kaigo', 'koki', 'nishiyama', 'suido', 'gesuido']
+ACC_NAME = {'ippan': '一般会計', 'kokuho': '国民健康保険特別会計', 'kansui': '簡易水道特別会計', 'noshu': '農業集落排水事業特別会計',
+            'kaigo': '介護保険特別会計', 'koki': '後期高齢者医療特別会計',
             'nishiyama': '西山財産区会計', 'suido': '水道事業会計', 'gesuido': '下水道事業会計'}
-TOKU, KIGYO = ['kokuho', 'kaigo', 'koki', 'nishiyama'], ['suido', 'gesuido']
+TOKU, KIGYO = ['kokuho', 'kansui', 'noshu', 'kaigo', 'koki', 'nishiyama'], ['suido', 'gesuido']
 KESSAN_KEYS = {
     'ippan': ['sainyu', 'saishutsu', 'sashihiki', 'jisshitsu'], 'kokuho': ['sainyu', 'saishutsu', 'sashihiki', 'jisshitsu'],
     'koki': ['sainyu', 'saishutsu', 'sashihiki', 'jisshitsu'], 'nishiyama': ['sainyu', 'saishutsu', 'sashihiki', 'jisshitsu'],
+    'kansui': ['sainyu', 'saishutsu', 'sashihiki', 'jisshitsu'], 'noshu': ['sainyu', 'saishutsu', 'sashihiki', 'jisshitsu'],
     'kaigo': [f'{k}-{s}' for s in ('hoken', 'service') for k in ('sainyu', 'saishutsu', 'sashihiki', 'jisshitsu')],
     'suido': ['shueki-shunyu', 'shueki-shishutsu', 'shihon-shunyu', 'shihon-shishutsu'],
     'gesuido': ['shueki-shunyu', 'shueki-shishutsu', 'shihon-shunyu', 'shihon-shishutsu'],
@@ -523,7 +533,6 @@ SHIHYO = ['zaiseiryoku', 'keijo', 'jisshitsu-kosaihi', 'shorai-futan', 'jisshits
 HIKAKU = {'zaiseiryoku': 'zaiseiryoku', 'keijo': 'keijo', 'jisshitsu-kosaihi': 'jisshitsu-kosaihi', 'shorai-futan': 'shorai-futan'}
 SOKI = ['jisshitsu-kosaihi', 'shorai-futan']
 ZY = ['h27', 'h28', 'h29', 'h30', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6']
-KOZO_YEARS = [6]
 
 
 def ival(v):
@@ -535,10 +544,11 @@ def row_key(*a):  # DOCS_SCHEMA §13.10（hino-town-docs tools/kozo.py の row_k
 
 
 LEDGER = {}
-for n in ('audit/hosei-r6.tsv', 'audit/kessan.tsv', 'audit/zaisei.tsv'):
+for n in (*HOSEI_AUDIT, 'audit/kessan.tsv', 'audit/zaisei.tsv'):
     for r in K[n]:
         LEDGER[r['key']] = (n, r)
-kz_used = {}   # 台帳 → {'n','a'(auto:pdftext),'k'(auto:check),'b'(auto:ai),'c'(人)}
+kz_used = {}   # (台帳, 区切り) → {'n','a'(auto:pdftext),'k'(auto:check),'b'(auto:ai),'c'(人)}。区切りは年度（r6 など）か zaisei
+KZ_BUCKET = ''
 
 
 def audited(table, row, cols, vals, unit, source):
@@ -552,7 +562,7 @@ def audited(table, row, cols, vals, unit, source):
     if r['checked'] != '✓' or r['note'].startswith('要人確認'):
         errors.append(f"検収の台帳: {table} {row} が検収済みでない（checked={r['checked']!r} note={r['note'][:30]!r}）")
         return
-    s = kz_used.setdefault(n, {'n': 0, 'a': 0, 'k': 0, 'b': 0, 'c': 0})
+    s = kz_used.setdefault((n, KZ_BUCKET), {'n': 0, 'a': 0, 'k': 0, 'b': 0, 'c': 0})
     s['n'] += 1
     rv = r['reviewer']
     s[{'auto:pdftext': 'a', 'auto:check': 'k', 'auto:ai': 'b'}.get(rv, 'c')] += 1
@@ -570,10 +580,25 @@ def doc_ref(doc, page):
 
 
 # 原典の誤りの記録で「原典のまま持つ」とされた行（回のつながりの検算で合わなくても通す）
-ISSUE_ROWS = set()
-for r in K['issues/yosan-r6-hosei-09.tsv']:
-    if r['status'] == '原典のまま持つ':
-        ISSUE_ROWS.update(re.findall(r'r[0-9]+-[a-z]+-[0-9]{2}/[a-z0-9-]+', r['where']))
+# 行（<回の id>/<行の key>）→ 記録のファイル。年度の検算で通した値の数を、記録のファイルごとに数える
+ISSUE_ROWS = {}
+for n in HOSEI_ISSUES:
+    for r in K[n]:
+        if r['status'] not in ('未判断', '原典のまま持つ', '対象外'):
+            errors.append(f"原典の誤りの記録: {n} no.{r['no']} の status が決まった語彙にない（{r['status']!r}）")
+        if r['status'] == '原典のまま持つ':
+            for w in re.findall(r'r[0-9]+-[a-z]+-[0-9]{2}/[a-z0-9-]+', r['where']):
+                ISSUE_ROWS[w] = n
+issue_used = {}   # 記録のファイル → 通した値の数（年度の処理の中で数える）
+
+
+def by_issue(*rows):
+    """検算で合わなかった値が、原典の誤りの記録で「原典のまま持つ」とされた行のものなら、数えて True を返す。"""
+    hit = [ISSUE_ROWS[r] for r in rows if r in ISSUE_ROWS]
+    if not hit:
+        return False
+    issue_used[hit[0]] = issue_used.get(hit[0], 0) + 1
+    return True
 
 kz_report = []
 kozo_years = []
@@ -581,6 +606,8 @@ for y in YEARS:
     if y not in KOZO_YEARS:
         continue
     fy = 2018 + y
+    KZ_BUCKET = f'r{y}'
+    issue_used = {}
     kais = {r['id']: r for r in K['hosei-kai.tsv'] if r['fiscal_year'] == str(fy)}
     if not kais:
         errors.append(f'構造化の層 r{y}: 補正予算の回が無い')
@@ -636,35 +663,34 @@ for y in YEARS:
             top_in = [k for k in d if re.fullmatch(r'in-[0-9]{2}', k)]
             top_out = [k for k in d if re.fullmatch(r'out-[0-9]{2}', k)]
             top_sei = [k for k in d if re.fullmatch(r'sei-[0-9]+', k)]
-            if sum(map(v, top_in)) != v('in-total'):
+            # 合わない値が原典の誤りの記録の行（§13.11 で「原典のまま持つ」）のものだけなら通し、数える
+            if sum(map(v, top_in)) != v('in-total') and not by_issue(f'{kid}/in-total'):
                 errors.append(f'款の表: {kid} の {c} で款の和 ≠ 歳入合計')
-            if sum(map(v, top_out)) != v('out-total'):
+            if sum(map(v, top_out)) != v('out-total') and not by_issue(f'{kid}/out-total'):
                 errors.append(f'款の表: {kid} の {c} で款の和 ≠ 歳出合計（目的別）')
-            if sum(map(v, top_sei)) != v('sei-total'):
+            if sum(map(v, top_sei)) != v('sei-total') and not by_issue(f'{kid}/sei-total'):
                 errors.append(f'款の表: {kid} の {c} で区分の和 ≠ 歳出合計（性質別）')
-            if not (v('in-total') == v('out-total') == v('sei-total')):
+            if not (v('in-total') == v('out-total') == v('sei-total')) and not by_issue(
+                    *(f'{kid}/{k}' for k, o in (('in-total', 'out-total'), ('out-total', 'in-total'), ('sei-total', 'out-total'))
+                      if v(k) != v(o))):
                 errors.append(f'款の表: {kid} の {c} で歳入合計・歳出合計（目的別）・歳出合計（性質別）が同じでない')
             for p in top_in + top_sei:
                 ch = [k for k in d if re.fullmatch(re.escape(p) + r'-[0-9]+', k)]
-                if ch and sum(map(v, ch)) != v(p):
+                if ch and sum(map(v, ch)) != v(p) and not by_issue(f'{kid}/{p}'):
                     errors.append(f'款の表: {kid} の {c} で {p} の内訳の和が合わない')
         for k, r in d.items():
             for a, b, h in (('mae', 'hosei', 'hoseigo'), ('mae_ippan', 'hosei_ippan', 'hoseigo_ippan')):
-                if ival(r[a]) + ival(r[b]) != ival(r[h]):
+                if ival(r[a]) + ival(r[b]) != ival(r[h]) and not by_issue(f'{kid}/{k}'):
                     errors.append(f'款の表: {kid}/{k} で {a}＋{b} ≠ {h}')
             if r['tosho'] != d['in-total']['tosho'] and k == 'out-total':
                 errors.append(f'款の表: {kid} の当初予算額が歳入と歳出で違う')
-    n_issue = 0
     for a, b in zip(order['ippan'], order['ippan'][1:]):
         for k, r in kan.get(b, {}).items():
             p = kan.get(a, {}).get(k)
             for c, h in (('mae', 'hoseigo'), ('mae_ippan', 'hoseigo_ippan')):
                 pv = ival(p[h]) if p else 0
-                if pv != ival(r[c]):
-                    if f'{b}/{k}' in ISSUE_ROWS:
-                        n_issue += 1
-                    else:
-                        errors.append(f'款の表: 回のつながり {a} → {b} の {k} の {c}（{pv:,} / {ival(r[c]):,}）')
+                if pv != ival(r[c]) and not by_issue(f'{b}/{k}'):
+                    errors.append(f'款の表: 回のつながり {a} → {b} の {k} の {c}（{pv:,} / {ival(r[c]):,}）')
     toshos = {kan[k]['in-total']['tosho'] for k in order['ippan'] if k in kan}
     if len(toshos) != 1:
         errors.append(f'款の表: 当初予算額が回で違う: {toshos}')
@@ -696,9 +722,10 @@ for y in YEARS:
     for g, rs in acc_rows.items():
         rs.sort(key=lambda r: order['ippan'].index(r['kai']))
         for a, b in zip(rs, rs[1:]):
-            if a['hoseigo'] != b['mae']:
+            if a['hoseigo'] != b['mae'] and not by_issue(f"{b['kai']}/{b['key']}"):
                 errors.append(f"会計の額: {g} のつながり {a['kai']} → {b['kai']}（{a['hoseigo']} / {b['mae']}）")
-        if len({r['tosho'] for r in rs}) != 1:
+        if len({r['tosho'] for r in rs}) != 1 and not by_issue(
+                *(f"{r['kai']}/{r['key']}" for r in rs if r['tosho'] != rs[0]['tosho'])):
             errors.append(f'会計の額: {g} の当初予算額が資料で違う')
     # 当初予算（data/totals-r<n>.json）との一致
     T = {a['name']: a['amount'] for a in totals[y]['accounts']}
@@ -710,8 +737,17 @@ for y in YEARS:
     ks = [acc_rows.get(('合計:kigyo', 'shishutsu', p)) for p in ('shueki', 'shihon')]
     if all(ks):
         chk.append(('企業会計', ival(ks[0][0]['tosho']) + ival(ks[1][0]['tosho']), '企業会計の表の支出の当初予算額（収益的＋資本的）'))
-    if len(chk) != 3:
-        errors.append(f'構造化の層 r{y}: 特別会計・企業会計の表が無く、当初予算と突き合わせられない')
+    # 特別会計の表・企業会計の表は、その会計の補正のある資料にだけ付く（§13.12）。表の無い年度は、その会計の回も無いことを確かめ、
+    # 会計ごとの行を出さない（令和8年度の企業会計。取り込んだ回までに企業会計の補正が無い）
+    no_table = []
+    for name, part, accs in (('特別会計', 'toku', TOKU), ('企業会計', 'kigyo', KIGYO)):
+        if any(c[0] == name for c in chk):
+            continue
+        if any(a in order for a in accs):
+            errors.append(f'構造化の層 r{y}: {name}の回があるのに{name}の表が無い')
+        no_table.append(part)
+    if not tt and not all(ks):
+        errors.append(f'構造化の層 r{y}: 特別会計・企業会計の表がどちらも無く、当初予算と突き合わせられない')
     for name, v, what in chk:
         if T.get(name) != v:
             errors.append(f'当初予算: {what} {v:,} ≠ data/totals-r{y}.json の{name} {T.get(name)}')
@@ -720,8 +756,12 @@ for y in YEARS:
     for r in K['kessan-gaku.tsv']:
         kgaku.setdefault(r['kai'], {})[r['key']] = r
     ikensho = f'kessan-r{y}-ikensho'
+    # 決算は、その年度の決算審査意見書の行があるときだけ出す。ある年度は、出す会計のすべてに意見書の行がそろうこと
+    has_kessan = any(r['doc'] == ikensho for r in K['kessan-gaku.tsv'] if r['kai'].startswith(f'r{y}-'))
 
     def kessan_of(acc):
+        if not has_kessan:
+            return None
         d = kgaku.get(f'r{y}-{acc}', {})
         out = []
         for key in KESSAN_KEYS[acc]:
@@ -743,6 +783,11 @@ for y in YEARS:
                 if g.get('sainyu' + s, 0) - g.get('saishutsu' + s, 0) != g.get('sashihiki' + s):
                     errors.append(f'決算: r{y}-{acc} で歳入総額−歳出総額 ≠ 歳入歳出差引額（{s or "総額"}）')
         return out
+
+    maru = {}
+    for r in K['hosei-maru.tsv']:
+        if r['kai'] in kais:
+            maru.setdefault(r['kai'], []).append(r)
 
     def steps_of(acc):
         """特別会計・企業会計の回ごとの行（会計の額の表から）。"""
@@ -767,9 +812,23 @@ for y in YEARS:
                 if any(hosei):
                     errors.append(f'会計の額: {acc} は {doc} で補正があるのに、その会計の回が無い')
                 continue
-            res.append({'kai': kid, 'gou': int(kais[kid]['gou']), 'title': kais[kid]['title'],
-                        'ref': doc_ref(doc, int(rs[cols[0]]['page'])),
-                        'v': [[ival(rs[c]['hosei']), ival(rs[c]['hoseigo'])] for c in cols]})
+            step = {'kai': kid, 'gou': int(kais[kid]['gou']), 'title': kais[kid]['title'],
+                    'ref': doc_ref(doc, int(rs[cols[0]]['page'])),
+                    'v': [[ival(rs[c]['hosei']), ival(rs[c]['hoseigo'])] for c in cols]}
+            # 繰越明許費だけを定める回（主な内容の行の金額が「－千円」。DOCS_SCHEMA §13.6・§13.10）。
+            # 主な内容の行が検収済みで、説明に「繰越明許費のみ」があり、会計の額の表の今回補正額が 0 であることを確かめ、原典の「－」を添える
+            empty = [m for m in maru.get(kid, []) if m['kind'] == 'toku' and m['amount'] == '']
+            if empty:
+                m = empty[0]
+                audited('hosei-maru', f"{kid}/{m['key']}", ['name', 'amount'], [m['name'], m['amount']], m['unit'],
+                        f"{m['doc']} p.{m['page']}")
+                if len(empty) != 1 or '繰越明許費のみ' not in m['desc'] or any(hosei):
+                    errors.append(f"主な内容の行: {kid}/{m['key']} の金額が空だが、繰越明許費のみの回と確かめられない")
+                step['hosei_raw'] = '－'
+                step['hosei_desc'] = m['desc'].rstrip('。')
+            if kais[kid]['prev'] == '' and int(kais[kid]['gou']) > 1:
+                step['no_prev'] = True   # 号の前の回が回の表に無い（議案はあるが資料の無い回。§13.6）
+            res.append(step)
         for doc, kid in kid_doc.items():
             errors.append(f'会計の額: {kid}（{doc}）の行が会計の額の表に無い')
         tosho = None
@@ -797,21 +856,39 @@ for y in YEARS:
     accounts.append({'kaikei': 'ippan', 'name': ACC_NAME['ippan'], 'kind': 'ippan',
                      'tosho': [ival(first['tosho'])], 'tosho_ippan': ival(first['tosho_ippan']),
                      'steps': st, 'kessan': kessan_of('ippan')})
+    in_table = {r['kaikei'] for r in kk if r['kaikei']}
     for acc in TOKU + KIGYO:
+        if acc not in in_table and acc not in order:
+            continue          # その年度の補正予算の概要の表に無い会計（令和5年度からの簡易水道・農業集落排水事業、令和8年度の企業会計）
         tosho, st = steps_of(acc)
         accounts.append({'kaikei': acc, 'name': ACC_NAME[acc], 'kind': 'toku' if acc in TOKU else 'kigyo',
                          'tosho': tosho, 'steps': st, 'kessan': kessan_of(acc)})
     n_steps = sum(len(a['steps']) for a in accounts)
     if n_steps != len(kais):
         errors.append(f'構造化の層 r{y}: 画面の回 {n_steps} ≠ 回の表の回 {len(kais)}')
-    kozo_years.append({'fy': y, 'label': f'令和{y}年度', 'accounts': accounts,
-                       'totals_src': {k: totals[y]['source'][k] for k in ('title', 'url', 'pdf_page', 'printed_page')},
-                       'n_kai': len(kais), 'n_kan': n_kan, 'n_kaikei': len(kk), 'n_issue': n_issue,
-                       'kessan_doc': doc_ref(ikensho, 0)})
+    n_issue = sum(issue_used.values())
+    yo = {'fy': y, 'label': f'令和{y}年度', 'accounts': accounts,
+          'totals_src': {k: totals[y]['source'][k] for k in ('title', 'url', 'pdf_page', 'printed_page')},
+          'n_kai': len(kais), 'n_kan': n_kan, 'n_kaikei': len(kk), 'n_issue': n_issue,
+          'kessan_doc': doc_ref(ikensho, 0) if has_kessan else None,
+          'issues': [{'file': 'data/struct/' + n, 'n': c} for n, c in sorted(issue_used.items())]}
+    if no_table:
+        yo['no_table'] = no_table
+    if not has_kessan:
+        # 決算の無い年度（年度の途中）は、取り込んだ最後の回の資料の題と日付を添える（日付は hino-town-docs の台帳の date）
+        last_doc = max({s['doc'] for k in kais for s in shiryo.get(k, []) if s['part'] != 'kaiken'},
+                       key=lambda d: (town_kz[d]['date'], d))
+        t = town_kz[last_doc]
+        yo['upto'] = {'doc': last_doc, 'title': t['title'], 'url': t['url'], 'date': t['date'],
+                      'kai': sorted(k for k in kais if any(s['doc'] == last_doc for s in shiryo.get(k, [])))}
+    kozo_years.append(yo)
     kz_report.append(f'令和{y}年度: 補正予算の回 {len(kais)}（' + '・'.join(f'{ACC_NAME[a]} {len(order[a])}' for a in ACC_ORDER if a in order) +
-                     f'）、款の行 {n_kan}行・会計の額 {len(kk)}行、回のつながりで原典の誤りの記録により通した値 {n_issue}個')
+                     f'）、款の行 {n_kan}行・会計の額 {len(kk)}行、原典の誤りの記録により通した値 {n_issue}個、' +
+                     ('決算あり' if has_kessan else f"決算なし（取り込んだ最後の資料 {yo['upto']['doc']}）") +
+                     ('、表の無い会計の区分 ' + '・'.join(no_table) if no_table else ''))
 
 # 財政指標
+KZ_BUCKET = 'zaisei'
 ZS = {r['key']: r for r in K['zaisei-shihyo.tsv']}
 ichi = {(r['key'], r['year']): r for r in K['zaisei-ichi.tsv'] if r['col'] == ''}
 
@@ -867,11 +944,14 @@ for yy in ZY:
     zdocs[yy] = doc_ref(d, 0)
 if errors:
     fail_now()
-LEDGER_FILE = {'audit/hosei-r6.tsv': 'hosei', 'audit/kessan.tsv': 'kessan', 'audit/zaisei.tsv': 'zaisei'}
+for yo in kozo_years:   # 年度ごとの、使った行の検収（補正予算の台帳と決算の台帳）
+    b = f"r{yo['fy']}"
+    yo['audit'] = {('hosei' if n.startswith('audit/hosei-') else 'kessan'): {'file': 'data/struct/' + n, **s}
+                   for (n, bb), s in sorted(kz_used.items()) if bb == b}
 kozo = {
     'commit': TD_COMMIT, 'years': kozo_years,
     'shihyo': {'years': ZY, 'items': shihyo, 'docs': [zdocs[yy] for yy in ZY]},
-    'audit': {LEDGER_FILE[n]: {'file': 'data/struct/' + n, **s} for n, s in sorted(kz_used.items())},
+    'audit': {'zaisei': {'file': 'data/struct/audit/zaisei.tsv', **kz_used[('audit/zaisei.tsv', 'zaisei')]}},
 }
 
 # 書き出し -----------------------------------------------------------------------
@@ -946,5 +1026,5 @@ for x in kz_report:
     print('  ' + x)
 print('  財政指標: ' + '・'.join(o['name'] for o in shihyo) + f'（{len(shihyo)}指標×{len(ZY)}年度、抜け 0）')
 print('  使った行の検収（台帳ごと。行数／プログラムの照合・機械の検算・AI・人）: ' + '、'.join(
-    f"{n} {s['n']}行／{s['a']}・{s['k']}・{s['b']}・{s['c']}" for n, s in sorted(kz_used.items())))
+    f"{n}（{b}） {s['n']}行／{s['a']}・{s['k']}・{s['b']}・{s['c']}" for (n, b), s in sorted(kz_used.items())))
 print('検算 OK。data.js を書き出しました。')
