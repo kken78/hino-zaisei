@@ -9,9 +9,9 @@
 <g font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif">
 <text x="80" y="104" fill="#C9D7EE" font-size="24" font-weight="700" letter-spacing="4">滋賀県 日野町</text>
 <rect x="80" y="122" width="64" height="4" rx="2" fill="#C9D7EE" opacity="0.8"/>
-<text x="78" y="206" fill="#ffffff" font-size="72" font-weight="700" letter-spacing="1">当初予算</text>
-<text x="78" y="284" fill="#ffffff" font-size="60" font-weight="700" letter-spacing="1">主な事業</text>
-<text x="82" y="352" fill="#ffffff" font-size="25" font-weight="500" opacity="0.88">当初予算の概要の附表を、柱・款・担当課ごとに、6年分</text>
+<text x="78" y="206" fill="#ffffff" font-size="72" font-weight="700" letter-spacing="1">予算と決算</text>
+<text x="78" y="284" fill="#ffffff" font-size="60" font-weight="700" letter-spacing="1">町の財政</text>
+<text x="82" y="352" fill="#ffffff" font-size="25" font-weight="500" opacity="0.88">当初予算の主な事業と、補正予算・決算・財政指標</text>
 <text x="82" y="486" fill="#ffffff" font-size="58" font-weight="700" >1,031</text>
 <text x="256" y="486" fill="#C9D7EE" font-size="26" font-weight="700" >事業</text>
 <text x="352.2" y="486" fill="#ffffff" font-size="58" font-weight="700" >令和3〜8</text>
