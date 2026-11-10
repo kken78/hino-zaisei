@@ -5,21 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#1E4E9C">
-<title>当初予算 主な事業（令和3〜8年度）｜日野町データポータル（非公式）</title>
+<title>予算と決算 町の財政｜日野町データポータル（非公式）</title>
 <meta name="description" content="滋賀県日野町の令和3〜8年度の当初予算の概要の附表「主な事業」に載った事業の一覧と、柱・款・担当課ごとの件数と金額、年度の推移。令和3〜8年度の補正予算と令和3〜7年度の決算、平成27〜令和6年度の財政指標（非公式）。">
-<link rel="canonical" href="https://kken78.github.io/hino-budget/">
+<link rel="canonical" href="https://kken78.github.io/hino-zaisei/">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNiAyNiI+PHJlY3Qgd2lkdGg9IjI2IiBoZWlnaHQ9IjI2IiByeD0iNiIgZmlsbD0iI0VGRjNGOSIvPjxyZWN0IHg9IjMiIHk9IjE1IiB3aWR0aD0iMjAiIGhlaWdodD0iMy40IiByeD0iMS43IiBmaWxsPSIjMUU0RTlDIi8+PHJlY3QgeD0iNS41IiB5PSI5LjUiIHdpZHRoPSIxNSIgaGVpZ2h0PSIzLjQiIHJ4PSIxLjciIGZpbGw9IiMzQjZGQkYiLz48cmVjdCB4PSI5IiB5PSI0IiB3aWR0aD0iOCIgaGVpZ2h0PSIzLjQiIHJ4PSIxLjciIGZpbGw9IiNDMzNEMkUiLz48L3N2Zz4=">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="日野町データポータル（非公式）">
-<meta property="og:title" content="当初予算 主な事業（令和3〜8年度）｜日野町データポータル">
+<meta property="og:title" content="予算と決算 町の財政｜日野町データポータル">
 <meta property="og:description" content="令和3〜8年度の当初予算の概要の附表から主な事業を柱・款・担当課ごとに転記し、年度の推移を示す。令和3〜8年度の補正予算の回ごとの額と令和3〜7年度の決算、平成27〜令和6年度の財政指標も載せる。公開資料から作成した個人の試作。">
-<meta property="og:url" content="https://kken78.github.io/hino-budget/">
-<meta property="og:image" content="https://kken78.github.io/hino-budget/og.png">
+<meta property="og:url" content="https://kken78.github.io/hino-zaisei/">
+<meta property="og:image" content="https://kken78.github.io/hino-zaisei/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="当初予算 主な事業。公開資料から作成した個人の試作（非公式）｜日野町データポータル">
+<meta property="og:image:alt" content="予算と決算 町の財政。公開資料から作成した個人の試作（非公式）｜日野町データポータル">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://kken78.github.io/hino-budget/og.png">
+<meta name="twitter:image" content="https://kken78.github.io/hino-zaisei/og.png">
 <style>
 :root{
   --ai:#1E4E9C; --ai-deep:#123563; --ai-ink:#0C2547;
@@ -54,6 +54,14 @@ button{cursor:pointer}
 .hero-note{margin-top:16px;font-size:var(--fs-2xs);opacity:.9;border-left:3px solid rgba(255,255,255,.5);padding:2px 0 2px 10px}
 .hero-note a{color:#fff}
 section{padding:36px 0 0}
+.tabbar{background:var(--card,#fff);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:4px;overflow-x:auto}
+.tab{flex:none;border:none;border-bottom:3px solid transparent;background:none;color:var(--ai);font-family:inherit;font-size:var(--fs-sm);font-weight:700;padding:12px 14px;min-height:48px;white-space:nowrap;cursor:pointer}
+.tab:hover{background:#F7F9FC}
+.tab[aria-selected="true"]{color:var(--ai-ink);border-bottom-color:var(--shu,#C33D2E)}
+.tabpanel[hidden],.hero[hidden]{display:none}
+.tabpanel:focus{outline:none}
+@media (max-width:767px){.hero{padding:16px 0 28px}.years{margin-bottom:12px}}
 .sec-head{margin-bottom:16px}
 .sec-head h2{font-family:var(--serif);font-size:var(--fs-h2);color:var(--ai-ink);letter-spacing:.03em}
 .sec-head p{color:var(--muted);font-size:var(--fs-xs);max-width:48em}
@@ -118,6 +126,13 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 .list-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .count{font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
 .count b{color:var(--ai-ink)}
+.pager{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin:10px 0;font-size:var(--fs-xs);font-variant-numeric:tabular-nums}
+.pager[hidden]{display:none}
+.pager .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;font-size:var(--fs-xs);color:var(--ai);min-height:42px}
+.pager .btn:disabled{color:var(--muted);cursor:default}
+.pager .per{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted)}
+.pager .per select{font-size:var(--fs-xs);color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:42px}
+@media (max-width:767px){.pager .per{margin-left:0}}
 .reset{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 12px;font-size:var(--fs-xs);color:var(--ai);min-height:36px;margin-left:8px}
 .items{border-top:1px solid var(--line)}
 .item{border-bottom:1px solid var(--line)}
@@ -235,15 +250,17 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <!-- portal-shared:header end -->
 <div class="portal-page"><div class="portal-wrap">
 <p class="portal-area">計画と予算</p>
-<h1 class="portal-title">当初予算 主な事業（令和3〜8年度）</h1>
-<p class="portal-lead">町の各年度の「当初予算の概要」の附表「令和○年度に取り組む主な事業」に載った事業を、柱・款・担当課ごとにまとめ、年度の推移を示しています。あわせて、令和3〜8年度の補正予算と令和3〜7年度の決算の額、平成27〜令和6年度の財政指標を載せています。</p>
-<p class="portal-asof">資料の時点：令和3〜8年度の各年度の当初予算、令和3〜8年度の補正予算（令和8年度は9月補正まで）と令和3〜7年度の決算、平成27〜令和6年度の財政状況資料集。材料の版の固定日：2026年11月6日（構造化の層は2026年11月9日）</p>
+<h1 class="portal-title">予算と決算 町の財政</h1>
+<p class="portal-lead">当初予算の附表に載った主な事業と、補正予算・決算・財政指標を、年度ごとに示しています。</p>
+<p class="portal-asof">資料の時点：令和3〜8年度の当初予算ほか（資料ごとの時点はページの末尾）。</p>
 <!-- portal-shared:siblings start -->
-<nav class="portal-siblings" aria-label="計画と予算のページ"><span class="portal-lbl">このほかのページ</span><a href="https://kken78.github.io/shiga-hino-plans/">計画ライブラリ</a><a href="https://kken78.github.io/hino-plan-dashboard/">総合計画 指標と事業費</a><span aria-current="page">当初予算 主な事業</span><a href="https://kken78.github.io/hino-shisan/">固定資産台帳 町の資産</a></nav>
+<nav class="portal-siblings" aria-label="計画と予算のページ"><span class="portal-lbl">このほかのページ</span><a href="https://kken78.github.io/shiga-hino-plans/">計画ライブラリ</a><a href="https://kken78.github.io/hino-plan-dashboard/">総合計画 指標と事業費</a><span aria-current="page">予算と決算 町の財政</span><a href="https://kken78.github.io/hino-shisan/">固定資産台帳 町の資産</a></nav>
 <!-- portal-shared:siblings end -->
 </div></div>
 
-<div class="hero">
+<div class="tabbar"><div class="wrap"><div class="tabs" role="tablist" aria-label="このページの画面"><button type="button" class="tab" role="tab" id="t-zaisei" aria-controls="p-zaisei" aria-selected="false" tabindex="-1">財政指標と予算の規模</button><button type="button" class="tab" role="tab" id="t-tosho" aria-controls="p-tosho" aria-selected="true" tabindex="0">当初予算</button><button type="button" class="tab" role="tab" id="t-list" aria-controls="p-list" aria-selected="false" tabindex="-1">事業の一覧</button><button type="button" class="tab" role="tab" id="t-kozo-ugoki" aria-controls="p-kozo-ugoki" aria-selected="false" tabindex="-1">補正予算と決算</button><button type="button" class="tab" role="tab" id="t-shogo" aria-controls="p-shogo" aria-selected="false" tabindex="-1">照合とデータ</button></div></div></div>
+
+<div class="hero" id="hero">
 <div class="wrap">
 <div class="years" role="group" aria-label="年度の切り替え" id="years"><span class="years-label">年度を選ぶ</span></div>
 <div class="kpis">
@@ -257,10 +274,37 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 </div>
 
 <main>
+<div class="tabpanel" role="tabpanel" id="p-zaisei" aria-labelledby="t-zaisei" tabindex="0" hidden>
+<section id="zaisei">
+<div class="wrap">
+<div class="sec-head"><h2 id="zsH2">財政指標の推移</h2>
+<p>各年度の「財政状況資料集」の総括表から、9つの指標を年度の順に並べています。比べる相手は、同じ資料の財政比較分析表にある全国平均・滋賀県平均・類似団体内順位と、健全化判断比率の早期健全化基準です。</p></div>
+<div class="card">
+<div class="zs-grid" id="zsCards"></div>
+<details class="alt"><summary>数値の表を開く（指標ごと・年度ごとの値と比べる相手）</summary><div class="table-wrap"><table id="tZs"><thead></thead><tbody></tbody></table></div></details>
+<p class="src-note" id="zsNote"></p>
+<p class="src-note" id="zsAudit"></p>
+</div>
+</div>
+</section>
+
+<section id="totals">
+<div class="wrap">
+<div class="sec-head"><h2>予算の規模（令和3〜8年度）</h2>
+<p>各年度の「当初予算の概要」の「予算の規模」の表から、会計ごとの額を転記しています。単位は千円。「前年度との差」は、この表の合計の差です。</p></div>
+<div class="card">
+<div class="table-wrap"><table id="tTotals"><thead></thead><tbody></tbody></table></div>
+<p class="src-note" id="totalsNote"></p>
+</div>
+</div>
+</section>
+</div>
+
+<div class="tabpanel" role="tabpanel" id="p-tosho" aria-labelledby="t-tosho" tabindex="0">
 <section>
 <div class="wrap">
 <div class="sec-head"><h2 id="plH2">柱別</h2>
-<p>附表は事業を5つの柱に分けて載せています。柱を押すと、下の「事業の一覧」をその柱の事業に絞り込みます。もう一度押すと解除します。</p></div>
+<p>附表は事業を5つの柱に分けて載せています。柱を押すと、「事業の一覧」の画面を開き、その柱の事業に絞り込みます。</p></div>
 <div class="card">
 <div class="chart-top">
 <h3 id="plTitle">柱ごとの予算額</h3>
@@ -297,10 +341,13 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 </div>
 </section>
 
+</div>
+
+<div class="tabpanel" role="tabpanel" id="p-list" aria-labelledby="t-list" tabindex="0" hidden>
 <section id="list">
 <div class="wrap">
 <div class="sec-head"><h2 id="listH2">事業の一覧</h2>
-<p>事業名を押すと、概要・内訳・予算額・担当課・款・区分・原典のページと、年度ごとの予算額の推移を表示します。令和8年度の事業には、対応する実施計画の事業も表示します。</p></div>
+<p>事業を20件ずつ表示します。事業名を押すと、概要・内訳・予算額・担当課・款・区分・原典のページと、年度ごとの予算額の推移を表示します。令和8年度の事業には、対応する実施計画の事業も表示します。</p></div>
 <div class="card">
 <div class="filters">
 <label class="q">検索（事業名・概要・担当課）<input type="search" id="fQ" placeholder="例：こども園"></label>
@@ -315,47 +362,29 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <button type="button" data-sort="amt" class="is-on" aria-pressed="true">予算額の多い順</button><button type="button" data-sort="orig" aria-pressed="false">原典の順</button>
 </div>
 </div>
+<div class="pager" id="pagerTop"><button type="button" class="btn" data-go="-1">前の事業</button><span class="info"></span><button type="button" class="btn" data-go="1">次の事業</button><label class="per">1ページの件数<select id="fPer"><option value="20">20件</option><option value="50">50件</option><option value="0">全件</option></select></label></div>
 <div class="items" id="items"></div>
+<div class="pager" id="pagerBottom"><button type="button" class="btn" data-go="-1">前の事業</button><span class="info"></span><button type="button" class="btn" data-go="1">次の事業</button></div>
 </div>
 </div>
 </section>
-
-<section id="totals">
-<div class="wrap">
-<div class="sec-head"><h2>予算の規模（令和3〜8年度）</h2>
-<p>各年度の「当初予算の概要」の「予算の規模」の表から、会計ごとの額を転記しています。単位は千円。「前年度との差」は、この表の合計の差です。</p></div>
-<div class="card">
-<div class="table-wrap"><table id="tTotals"><thead></thead><tbody></tbody></table></div>
-<p class="src-note" id="totalsNote"></p>
 </div>
-</div>
-</section>
 
+<div class="tabpanel" role="tabpanel" id="p-kozo-ugoki" aria-labelledby="t-kozo-ugoki" tabindex="0" hidden>
 <section id="kozo-ugoki">
 <div class="wrap">
-<div class="sec-head"><h2 id="kyH2">年度の中の動き</h2>
-<p>会計ごとに、当初予算、補正予算の回ごと（号の順）の額、決算の額を並べています。補正予算は各回の「補正予算の概要」、決算は「決算審査意見書」の額です。令和3〜8年度から年度を選べます。令和8年度は年度の途中で、取り込んだ回までです。</p></div>
+<div class="sec-head"><h2 id="kyH2">補正予算と決算</h2>
+<p>当初予算の額が、年度の中で補正予算の回ごと（号の順）にどう変わり、決算でいくらになったかを、会計ごとに並べています。補正予算は各回の「補正予算の概要」、決算は「決算審査意見書」の額です。令和3〜8年度から年度を選べます。令和8年度は年度の途中で、取り込んだ回までです。</p></div>
 <div class="card">
-<div class="ky-years" role="group" aria-label="年度の中の動きの年度" id="kyYears"><span class="lbl">年度を選ぶ</span></div>
+<div class="ky-years" role="group" aria-label="補正予算と決算の年度" id="kyYears"><span class="lbl">年度を選ぶ</span></div>
 <div id="kyBody"></div>
 <p class="src-note" id="kyAudit"></p>
 </div>
 </div>
 </section>
-
-<section id="zaisei">
-<div class="wrap">
-<div class="sec-head"><h2 id="zsH2">財政指標の推移</h2>
-<p>各年度の「財政状況資料集」の総括表から、9つの指標を年度の順に並べています。比べる相手は、同じ資料の財政比較分析表にある全国平均・滋賀県平均・類似団体内順位と、健全化判断比率の早期健全化基準です。</p></div>
-<div class="card">
-<div class="zs-grid" id="zsCards"></div>
-<details class="alt"><summary>数値の表を開く（指標ごと・年度ごとの値と比べる相手）</summary><div class="table-wrap"><table id="tZs"><thead></thead><tbody></tbody></table></div></details>
-<p class="src-note" id="zsNote"></p>
-<p class="src-note" id="zsAudit"></p>
 </div>
-</div>
-</section>
 
+<div class="tabpanel" role="tabpanel" id="p-shogo" aria-labelledby="t-shogo" tabindex="0" hidden>
 <section id="shogo">
 <div class="wrap">
 <div class="sec-head"><h2>原典との照合（年度ごと）</h2>
@@ -389,19 +418,20 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <p>「附表に無い」は、その年度の附表に載っていないことを示すもので、予算が無かったとは限りません。分かれた事業・まとまった事業は、どの部分が引き継がれたかを原典で確かめられないため、つないでいません。</p></div>
 <div class="card"><h3>実施計画との対応</h3>
 <p id="linkText"></p></div>
-<div class="card"><h3>年度の中の動きと財政指標</h3>
-<p>年度の中の動きと財政指標の推移は、hino-town-docs の構造化の層（DOCS_SCHEMA.md §13）から作っています。原典の数字を回と行のキーのある表に写し、行ごとに原典と照らして検収したもので、このページでは検収の済んだ行だけを使います。</p>
+<div class="card"><h3>補正予算と決算、財政指標</h3>
+<p>補正予算と決算の額と、財政指標の推移は、hino-town-docs の構造化の層（DOCS_SCHEMA.md §13）から作っています。原典の数字を回と行のキーのある表に写し、行ごとに原典と照らして検収したもので、このページでは検収の済んだ行だけを使います。</p>
 <p>補正予算の額の単位は千円です。決算の額は、決算審査意見書の円の額を、表示のために千円に四捨五入しています。原典の円の額は、千円の値の下に添えています。</p>
 <p id="kyGenko"></p>
 <p>決算の事業ごとの数字（主要な施策の成果を説明する書類など）は町のサイトに公開されていないため、事業の単位の決算は載せていません。決算は会計の単位までです。</p>
-<p>年度の中の動きは、令和3〜8年度です。決算は決算審査意見書のある令和3〜7年度だけで、令和8年度は取り込んだ補正予算の回までです。最初に開く年度は、構造化の層のある一番新しい年度（いま動いている年度）です。会計は、その年度の補正予算の概要の特別会計の表・企業会計の表にあるものです（令和3・4年度は簡易水道特別会計と農業集落排水事業特別会計を含みます）。</p>
-<p>財政指標の総括表の値は普通会計の値で、上の一般会計の決算の額とは範囲が違います。</p></div>
+<p>補正予算と決算の画面は、令和3〜8年度です。決算は決算審査意見書のある令和3〜7年度だけで、令和8年度は取り込んだ補正予算の回までです。最初に開く年度は、構造化の層のある一番新しい年度（いま動いている年度）です。会計は、その年度の補正予算の概要の特別会計の表・企業会計の表にあるものです（令和3・4年度は簡易水道特別会計と農業集落排水事業特別会計を含みます）。</p>
+<p>財政指標の総括表の値は普通会計の値で、「補正予算と決算」の一般会計の決算の額とは範囲が違います。</p></div>
 <div class="card"><h3>材料の版</h3>
 <p>このページは、次のリポジトリの決まった版の材料から作っています。当初予算の総額と会計ごとの額は、このリポジトリで原典の PDF の文字とページの画像に照らして転記し、会計ごとの額の和が合計と合うことと、出典の URL・バイト数・sha256 が hino-town-docs の台帳と合うことを確かめています。</p>
 <p id="inputsText"></p></div>
 </div>
 </div>
 </section>
+</div>
 </main>
 
 <!-- portal-shared:footer start -->
@@ -411,8 +441,8 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <dt>出典</dt><dd>日野町の各年度の「予算」のページ（例 <a href="https://www.town.shiga-hino.lg.jp/0000008534.html">令和8年度予算</a>）にある「当初予算の概要」と、その附表「令和○年度に取り組む主な事業」（どちらも PDF）。令和3〜8年度の各回の「補正予算の概要」と、令和3〜7年度の「決算審査意見書」（PDF）。平成27〜令和6年度の「財政状況資料集」（Excel）。年度ごとのリンクは、上の「データについて」と各節の表にあります。</dd>
 <dt>資料の時点</dt><dd>令和3〜8年度の各年度の当初予算、令和3〜8年度の補正予算（令和8年度は9月補正まで）と令和3〜7年度の決算、平成27〜令和6年度の財政状況資料集。原典の取得日は2026年10月19日から11月7日（年度ごとの日付は「データについて」）、材料の版の固定日は2026年11月6日（構造化の層は2026年11月9日）です。</dd>
 <dt>注意</dt><dd><p>内容の正確性を保証するものではありません。最新・正確な情報は日野町の公式ページでご確認ください。</p><p>事業名・金額などは公表資料からの転記です。<a href="https://www.town.shiga-hino.lg.jp/">日野町ホームページ</a></p></dd>
-<dt>データ</dt><dd><a href="https://github.com/kken78/hino-budget/blob/main/data.js">data.js</a>（画面用。材料から作ったもの）、<a href="https://github.com/kken78/hino-budget/tree/main/data">data/</a>（予算の規模の JSON）、<a href="https://github.com/kken78/hino-budget/blob/main/inputs.lock.json">inputs.lock.json</a>（材料の版）。附表の事業の JSON は <a href="https://github.com/kken78/shiga-hino-plans/tree/main/data/fuhyo">shiga-hino-plans の data/fuhyo/</a>、補正予算・決算・財政指標の表は <a href="https://github.com/kken78/hino-town-docs/tree/main/data/struct">hino-town-docs の data/struct/</a> にあります。</dd>
-<dt>ソースコード</dt><dd><a href="https://github.com/kken78/hino-budget">kken78/hino-budget</a>（GitHub）</dd>
+<dt>データ</dt><dd><a href="https://github.com/kken78/hino-zaisei/blob/main/data.js">data.js</a>（画面用。材料から作ったもの）、<a href="https://github.com/kken78/hino-zaisei/tree/main/data">data/</a>（予算の規模の JSON）、<a href="https://github.com/kken78/hino-zaisei/blob/main/inputs.lock.json">inputs.lock.json</a>（材料の版）。附表の事業の JSON は <a href="https://github.com/kken78/shiga-hino-plans/tree/main/data/fuhyo">shiga-hino-plans の data/fuhyo/</a>、補正予算・決算・財政指標の表は <a href="https://github.com/kken78/hino-town-docs/tree/main/data/struct">hino-town-docs の data/struct/</a> にあります。</dd>
+<dt>ソースコード</dt><dd><a href="https://github.com/kken78/hino-zaisei">kken78/hino-zaisei</a>（GitHub）</dd>
 <dt>ライセンス</dt><dd>コードは MIT License。data.js の構造は CC BY 4.0。転記した文字と数字は日野町の公表資料によるもので、このリポジトリのライセンスの対象外です。</dd>
 </dl>
 </div></footer>
@@ -423,7 +453,7 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 const SITES = {
   portal: 'https://kken78.github.io/hino-portal/',
   plans: 'https://kken78.github.io/shiga-hino-plans/',
-  budget: 'https://kken78.github.io/hino-budget/',
+  budget: 'https://kken78.github.io/hino-zaisei/',
   population: 'https://kken78.github.io/hino-population/'
 };
 
@@ -532,12 +562,44 @@ function drawPillars(){
   }).join('');
   document.getElementById('plTitle').textContent = (plMode === 'amt' ? '柱ごとの予算額' : '柱ごとの件数') + '（' + Y[FY].label + '）';
 }
+/* タブ（ADR-7）。#〈タブの名前〉か、節の id（#trend・#totals など）で開ける */
+const TABS = ['zaisei', 'tosho', 'list', 'kozo-ugoki', 'shogo'];
+const SEC_TAB = {trend: 'tosho', totals: 'zaisei'};
+function showTab(k, opt){
+  opt = opt || {};
+  TABS.forEach(t => {
+    const on = t === k, b = document.getElementById('t-' + t);
+    b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
+    document.getElementById('p-' + t).hidden = !on;
+  });
+  document.getElementById('hero').hidden = !(k === 'tosho' || k === 'list');
+  if (k === 'tosho' && typeof drawTrend === 'function') drawTrend();
+  if (opt.hash !== false) history.replaceState(null, '', '#' + (opt.sec || k));
+  if (opt.focus) document.getElementById('t-' + k).focus();
+}
+function openFromHash(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return;
+  const k = TABS.includes(h) ? h : SEC_TAB[h];
+  if (!k) return;
+  showTab(k, {sec: h});
+  if (k !== h) { const el = document.getElementById(h); if (el) el.scrollIntoView({block: 'start'}); }
+}
+document.querySelectorAll('.tabs .tab').forEach((b, i, all) => {
+  b.addEventListener('click', () => showTab(b.id.slice(2)));
+  b.addEventListener('keydown', e => {
+    const to = e.key === 'ArrowRight' ? (i + 1) % all.length : e.key === 'ArrowLeft' ? (i - 1 + all.length) % all.length : e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : -1;
+    if (to < 0) return;
+    e.preventDefault(); showTab(all[to].id.slice(2), {focus: true});
+  });
+});
+window.addEventListener('hashchange', openFromHash);
 document.getElementById('pls').addEventListener('click', e => {
   const b = e.target.closest('.pl'); if (!b) return;
   state.pillar = state.pillar === b.dataset.no ? '' : b.dataset.no;
   document.getElementById('fPillar').value = state.pillar;
   render();
-  if (state.pillar) document.getElementById('list').scrollIntoView({behavior: 'smooth', block: 'start'});
+  if (state.pillar) { showTab('list'); document.querySelector('.tabbar').scrollIntoView({block: 'start'}); }
 });
 document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
   plMode = b.dataset.mode;
@@ -662,6 +724,25 @@ function itemHtml(it){
     js + '</dl>' + chainHtml(it) + '</div></details>';
 }
 
+let page = 0, per = 20, shown = [];
+function drawPage(){
+  const n = shown.length, size = per || n || 1, pages = Math.max(1, Math.ceil(n / size));
+  if (page >= pages) page = pages - 1;
+  const part = shown.slice(page * size, page * size + size);
+  document.getElementById('items').innerHTML = n ? part.map(itemHtml).join('') : '<p class="empty">条件に合う事業はありません。</p>';
+  const info = n ? nu(fmt(page * size + 1) + '〜' + fmt(Math.min(n, page * size + size)) + '件目') + '（' + nu(fmt(page + 1) + '／' + fmt(pages) + 'ページ') + '）' : '';
+  document.querySelectorAll('#list .pager').forEach(pg => {
+    pg.querySelector('.info').innerHTML = info;
+    pg.querySelector('[data-go="-1"]').disabled = page === 0;
+    pg.querySelector('[data-go="1"]').disabled = page >= pages - 1;
+    pg.hidden = pg.id === 'pagerBottom' && pages === 1;
+  });
+}
+document.querySelectorAll('#list .pager [data-go]').forEach(b => b.addEventListener('click', () => {
+  page += +b.dataset.go; drawPage();
+  if (b.closest('#pagerBottom')) document.getElementById('pagerTop').scrollIntoView({block: 'nearest'});
+}));
+document.getElementById('fPer').addEventListener('change', e => { per = +e.target.value; page = 0; drawPage(); });
 function render(){
   const terms = state.q.split(/[\s　]+/).map(norm).filter(Boolean);
   let a = IT.filter(it =>
@@ -671,7 +752,7 @@ function render(){
     (!state.kubun || it.kubun.includes(state.kubun)) &&
     terms.every(t => it._hay.includes(t)));
   a = a.slice().sort(state.sort === 'amt' ? (x, y) => y.amount - x.amount || x._i - y._i : (x, y) => x._i - y._i);
-  document.getElementById('items').innerHTML = a.length ? a.map(itemHtml).join('') : '<p class="empty">条件に合う事業はありません。</p>';
+  shown = a; page = 0; drawPage();
   const any = state.q || state.pillar || state.kan || state.dept || state.kubun;
   document.getElementById('count').innerHTML = nu('<b>' + fmt(a.length) + '</b>件') + '・予算額の計 ' + nu('<b>' + fmt(sum(a)) + '</b> 千円') +
     (any ? '（' + esc(Y[FY].label) + 'の全' + nu(IT.length + '件') + 'のうち）<button type="button" class="reset" id="reset">条件を解除</button>' : '');
@@ -799,7 +880,7 @@ const ISSUE_TEXT = {
 function drawKy(){
   const yr = KZ.years.find(y => y.fy === KY);
   kyBox.querySelectorAll('[data-ky]').forEach(b => { const on = Number(b.dataset.ky) === KY; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); });
-  document.getElementById('kyH2').textContent = '年度の中の動き（' + yr.label + '）';
+  document.getElementById('kyH2').textContent = '補正予算と決算（' + yr.label + '）';
   const A = yr.accounts;
   const noKigyo = (yr.no_table || []).includes('kigyo');
   const upto = yr.upto ? '<p class="ky-note">' + esc(yr.label) + 'は年度の途中のため、取り込んだ回までです。最後に取り込んだ資料は「' + docA(yr.upto, esc(yr.upto.title)) + '」（' + nu(ymd(yr.upto.date)) + '）です。' + esc(yr.label) + 'の決算はまだ無いので、決算の行は載せていません。</p>' : '';
@@ -872,6 +953,7 @@ document.getElementById('zsAudit').innerHTML = '原典との照合：hino-town-d
 
 selectYear();
 drawTrend();
+openFromHash();
 </script>
 </body>
 </html>
