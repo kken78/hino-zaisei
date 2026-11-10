@@ -1,6 +1,6 @@
 # 予算と決算 町の財政（日野町データポータル・非公式）
 
-https://kken78.github.io/hino-budget/
+https://kken78.github.io/hino-zaisei/
 
 滋賀県日野町の令和3〜8年度の「当初予算の概要」の附表「令和○年度に取り組む主な事業」に載った事業（6年分で1,031件）を、年度ごとに柱・款・担当課ごとの件数と予算額、事業の一覧で見るページです。柱ごとの事業費の6年分の推移と、同じ事業の年度をまたいだ予算額の推移も示します。附表に載った事業だけを集計したもので、町の予算の全体ではありません。参考として、各年度の当初予算の総額と会計ごとの額（「当初予算の概要」の「予算の規模」の表）を付記しています。
 
@@ -48,7 +48,7 @@ https://kken78.github.io/hino-budget/
 
 ## 作り直し方
 
-1. このリポジトリと同じフォルダに、shiga-hino-plans・hino-ronten・hino-town-docs を置く（例 `~/GitHub/hino-budget` と `~/GitHub/shiga-hino-plans`・`~/GitHub/hino-ronten`・`~/GitHub/hino-town-docs`）。
+1. このリポジトリと同じフォルダに、shiga-hino-plans・hino-ronten・hino-town-docs を置く（例 `~/GitHub/hino-zaisei` と `~/GitHub/shiga-hino-plans`・`~/GitHub/hino-ronten`・`~/GitHub/hino-town-docs`）。
    各リポジトリは `inputs.lock.json` の commit の版にする（`git -C ../shiga-hino-plans checkout <commit>` など）。別の場所に置いたときは、次の手順で `--src <フォルダ>` を付ける。
 2. `python3 tools/build_data.py` を実行する。次の検算がすべて合ったときだけ `data.js` が書き出される。合わなければ、合わない行を表示して終了コード 1 で止まる。
    - 材料の sha256 が `inputs.lock.json` と一致する
@@ -106,4 +106,4 @@ https://kken78.github.io/hino-budget/
 
 ## ライセンス
 
-コードは MIT License（[LICENSE](LICENSE)）。`data.js` の構造は CC BY 4.0（表示は https://github.com/kken78/hino-budget ）。転記した文字と数字は日野町の公表資料によるもので、このリポジトリのライセンスの対象外。
+コードは MIT License（[LICENSE](LICENSE)）。`data.js` の構造は CC BY 4.0（表示は https://github.com/kken78/hino-zaisei ）。転記した文字と数字は日野町の公表資料によるもので、このリポジトリのライセンスの対象外。

@@ -22,7 +22,7 @@ jobs:
       # 材料のリポジトリを隣のフォルダに置くため、このリポジトリも1段下に置く
       - uses: actions/checkout@v7
         with:
-          path: hino-budget
+          path: hino-zaisei
 
       - uses: actions/setup-python@v7
         with:
@@ -30,7 +30,7 @@ jobs:
 
       - name: inputs.lock.json から材料の commit を読む
         id: lock
-        working-directory: hino-budget
+        working-directory: hino-zaisei
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
           import json, sys
@@ -72,7 +72,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import json, os, sys
-          lock = json.load(open('hino-budget/inputs.lock.json', encoding='utf-8'))
+          lock = json.load(open('hino-zaisei/inputs.lock.json', encoding='utf-8'))
           miss = [f"{i['repo']} {i['path']}" for i in lock['inputs']
                   if not os.path.isfile(os.path.join(i['repo'].split('/')[1], i['path']))]
           if miss:
@@ -81,11 +81,11 @@ jobs:
           PY
 
       - name: 材料の検算と data.js の作り直し(build_data.py)
-        working-directory: hino-budget
+        working-directory: hino-zaisei
         run: python3 tools/build_data.py --src "$GITHUB_WORKSPACE"
 
       - name: data.js がコミットされたものと一致するか
-        working-directory: hino-budget
+        working-directory: hino-zaisei
         run: |
           if ! git diff --exit-code --stat -- data.js; then
             echo "::error::data.js が材料から作り直した結果と一致しません。python3 tools/build_data.py を実行してコミットしてください。"
@@ -95,7 +95,7 @@ jobs:
       # 共通の部品（見出し・分野のナビ・ページの一覧・フッター）は hino-portal の shared/ の写し（DESIGN.md ADR-1）
       # 文字の大きさは hino-portal DESIGN.md 5.2（DESIGN.md ADR-3）
       - name: 共通の部品と文字の大きさ（hino-portal の shared/check.py）
-        working-directory: hino-budget
+        working-directory: hino-zaisei
         run: |
           git clone --depth 1 https://github.com/kken78/hino-portal.git /tmp/hino-portal
           python3 /tmp/hino-portal/shared/check.py --fonts index.html
@@ -109,5 +109,5 @@ jobs:
           mkdir -p /tmp/pw && cd /tmp/pw
           npm install --no-save --no-package-lock playwright@1.49.1
           npx playwright install --with-deps chromium
-          cd "$GITHUB_WORKSPACE/hino-budget"
+          cd "$GITHUB_WORKSPACE/hino-zaisei"
           PLAYWRIGHT_MODULE=/tmp/pw/node_modules/playwright/index.mjs node /tmp/hino-portal/shared/check_mobile.mjs index.html

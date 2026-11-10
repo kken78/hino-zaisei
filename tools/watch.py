@@ -37,7 +37,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.path.join(ROOT, "data", "watch.tsv")
 HOST = "www.town.shiga-hino.lg.jp"
 CATEGORY = f"https://{HOST}/category/32-6-1-0-0-0-0-0-0-0.html"   # 町政情報 > 行財政運営 > 予算
-UA = "hino-budget-watch/1.0 (+https://github.com/kken78/hino-budget)"
+UA = "hino-zaisei-watch/1.0 (+https://github.com/kken78/hino-zaisei)"
 TIMEOUT = 30
 INTERVAL = 1.0
 JST = timezone(timedelta(hours=9))
