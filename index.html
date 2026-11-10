@@ -118,6 +118,13 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 .list-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .count{font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
 .count b{color:var(--ai-ink)}
+.pager{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin:10px 0;font-size:var(--fs-xs);font-variant-numeric:tabular-nums}
+.pager[hidden]{display:none}
+.pager .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;font-size:var(--fs-xs);color:var(--ai);min-height:42px}
+.pager .btn:disabled{color:var(--muted);cursor:default}
+.pager .per{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted)}
+.pager .per select{font-size:var(--fs-xs);color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:42px}
+@media (max-width:767px){.pager .per{margin-left:0}}
 .reset{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 12px;font-size:var(--fs-xs);color:var(--ai);min-height:36px;margin-left:8px}
 .items{border-top:1px solid var(--line)}
 .item{border-bottom:1px solid var(--line)}
@@ -300,7 +307,7 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <section id="list">
 <div class="wrap">
 <div class="sec-head"><h2 id="listH2">事業の一覧</h2>
-<p>事業名を押すと、概要・内訳・予算額・担当課・款・区分・原典のページと、年度ごとの予算額の推移を表示します。令和8年度の事業には、対応する実施計画の事業も表示します。</p></div>
+<p>事業を20件ずつ表示します。事業名を押すと、概要・内訳・予算額・担当課・款・区分・原典のページと、年度ごとの予算額の推移を表示します。令和8年度の事業には、対応する実施計画の事業も表示します。</p></div>
 <div class="card">
 <div class="filters">
 <label class="q">検索（事業名・概要・担当課）<input type="search" id="fQ" placeholder="例：こども園"></label>
@@ -315,7 +322,9 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <button type="button" data-sort="amt" class="is-on" aria-pressed="true">予算額の多い順</button><button type="button" data-sort="orig" aria-pressed="false">原典の順</button>
 </div>
 </div>
+<div class="pager" id="pagerTop"><button type="button" class="btn" data-go="-1">前の事業</button><span class="info"></span><button type="button" class="btn" data-go="1">次の事業</button><label class="per">1ページの件数<select id="fPer"><option value="20">20件</option><option value="50">50件</option><option value="0">全件</option></select></label></div>
 <div class="items" id="items"></div>
+<div class="pager" id="pagerBottom"><button type="button" class="btn" data-go="-1">前の事業</button><span class="info"></span><button type="button" class="btn" data-go="1">次の事業</button></div>
 </div>
 </div>
 </section>
@@ -662,6 +671,25 @@ function itemHtml(it){
     js + '</dl>' + chainHtml(it) + '</div></details>';
 }
 
+let page = 0, per = 20, shown = [];
+function drawPage(){
+  const n = shown.length, size = per || n || 1, pages = Math.max(1, Math.ceil(n / size));
+  if (page >= pages) page = pages - 1;
+  const part = shown.slice(page * size, page * size + size);
+  document.getElementById('items').innerHTML = n ? part.map(itemHtml).join('') : '<p class="empty">条件に合う事業はありません。</p>';
+  const info = n ? nu(fmt(page * size + 1) + '〜' + fmt(Math.min(n, page * size + size)) + '件目') + '（' + nu(fmt(page + 1) + '／' + fmt(pages) + 'ページ') + '）' : '';
+  document.querySelectorAll('#list .pager').forEach(pg => {
+    pg.querySelector('.info').innerHTML = info;
+    pg.querySelector('[data-go="-1"]').disabled = page === 0;
+    pg.querySelector('[data-go="1"]').disabled = page >= pages - 1;
+    pg.hidden = pg.id === 'pagerBottom' && pages === 1;
+  });
+}
+document.querySelectorAll('#list .pager [data-go]').forEach(b => b.addEventListener('click', () => {
+  page += +b.dataset.go; drawPage();
+  if (b.closest('#pagerBottom')) document.getElementById('pagerTop').scrollIntoView({block: 'nearest'});
+}));
+document.getElementById('fPer').addEventListener('change', e => { per = +e.target.value; page = 0; drawPage(); });
 function render(){
   const terms = state.q.split(/[\s　]+/).map(norm).filter(Boolean);
   let a = IT.filter(it =>
@@ -671,7 +699,7 @@ function render(){
     (!state.kubun || it.kubun.includes(state.kubun)) &&
     terms.every(t => it._hay.includes(t)));
   a = a.slice().sort(state.sort === 'amt' ? (x, y) => y.amount - x.amount || x._i - y._i : (x, y) => x._i - y._i);
-  document.getElementById('items').innerHTML = a.length ? a.map(itemHtml).join('') : '<p class="empty">条件に合う事業はありません。</p>';
+  shown = a; page = 0; drawPage();
   const any = state.q || state.pillar || state.kan || state.dept || state.kubun;
   document.getElementById('count').innerHTML = nu('<b>' + fmt(a.length) + '</b>件') + '・予算額の計 ' + nu('<b>' + fmt(sum(a)) + '</b> 千円') +
     (any ? '（' + esc(Y[FY].label) + 'の全' + nu(IT.length + '件') + 'のうち）<button type="button" class="reset" id="reset">条件を解除</button>' : '');
