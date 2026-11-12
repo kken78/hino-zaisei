@@ -1,0 +1,77 @@
+{
+  "note": "tools/build_links.py が読んだ材料。画面に組み込むときに inputs.lock.json へ移す（DESIGN.md ADR-9）。",
+  "inputs": [
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "60cd50b3c6b013c73fda7a9a9af7298fa7040078",
+      "path": "data/struct/kessan-iken.tsv",
+      "sha256": "0f65d8fa47815cd4615e154f06a04a3a1041179b80cf75a6bef968455b757fb2"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "60cd50b3c6b013c73fda7a9a9af7298fa7040078",
+      "path": "data/text/kessan-r3-ikensho.txt",
+      "sha256": "a8ecf4751db92bdcdf1e2b0426dd47976b274b5a83809eb0e11acd789deab0fb"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "60cd50b3c6b013c73fda7a9a9af7298fa7040078",
+      "path": "data/text/kessan-r4-ikensho.txt",
+      "sha256": "81c39af16a7cabed57ad561b0d0933904500232acb66db4b1d8122aac9a7f130"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "60cd50b3c6b013c73fda7a9a9af7298fa7040078",
+      "path": "data/text/kessan-r5-ikensho.txt",
+      "sha256": "4fa4d7109b0ea26381123e0ff817da44e82f74cdf38d331a4d216b915d3f06a7"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "60cd50b3c6b013c73fda7a9a9af7298fa7040078",
+      "path": "data/text/kessan-r6-ikensho.txt",
+      "sha256": "4d6720d0d99d98f7b6fdf8848752b43bdba41696de3ccba50fdff1e9a020fc98"
+    },
+    {
+      "repo": "kken78/hino-council-search",
+      "commit": "f8b923593e3db2cc320d85991b9b8e680b59e0dc",
+      "path": "public/data/gian.json",
+      "sha256": "498d93f96bec75efefc21028a504ff08a48296437b58b057f5a545a4ac1790a0"
+    },
+    {
+      "repo": "kken78/hino-council-search",
+      "commit": "f8b923593e3db2cc320d85991b9b8e680b59e0dc",
+      "path": "public/data/index/2022.json",
+      "sha256": "79fb73bcb018e64d0ee20dee2c10bcb52eeba0dd3c18282a8b0f64348d43c302"
+    },
+    {
+      "repo": "kken78/hino-council-search",
+      "commit": "f8b923593e3db2cc320d85991b9b8e680b59e0dc",
+      "path": "public/data/index/2023.json",
+      "sha256": "0130fd8ff4b7e160d8aedf22ff62cd1a7df886c9fc5dbfe9986a809e37ef151b"
+    },
+    {
+      "repo": "kken78/hino-council-search",
+      "commit": "f8b923593e3db2cc320d85991b9b8e680b59e0dc",
+      "path": "public/data/index/2024.json",
+      "sha256": "6580197d76422b7b761f91dca31dd44109b3b68f629841737352512bb7304a5e"
+    },
+    {
+      "repo": "kken78/hino-council-search",
+      "commit": "f8b923593e3db2cc320d85991b9b8e680b59e0dc",
+      "path": "public/data/index/2025.json",
+      "sha256": "91ae06ebe29cbf46a56845496d0052ee2e0a54e0924a0b66232ca2275462076a"
+    },
+    {
+      "repo": "kken78/hino-council-search",
+      "commit": "f8b923593e3db2cc320d85991b9b8e680b59e0dc",
+      "path": "public/data/meetings.json",
+      "sha256": "06edbff4007ebe31ec1ec79587a44b9a1fff5205cdc0d6e8669343e5b1341ede"
+    },
+    {
+      "repo": "kken78/hino-council-search",
+      "commit": "f8b923593e3db2cc320d85991b9b8e680b59e0dc",
+      "path": "public/data/proceedings.json",
+      "sha256": "c3981ca95bdc4a3cc8c288d0331359ca47f5ed838d392d0a8b0d859001285de6"
+    }
+  ]
+}
