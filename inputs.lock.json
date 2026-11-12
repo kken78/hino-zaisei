@@ -1,5 +1,5 @@
 {
-  "note": "tools/build_data.py が読む材料。各リポジトリを git pull したあとの HEAD で固定した（2026-11-06。附表の検収の完了と読みの注の版に上げた）。hino-town-docs は 2026-11-08 に構造化の層（data/struct/）を足し、data/sources.tsv も同じ commit に上げた（CI はリポジトリごとに commit を1つだけ取り出すため）。材料は、このリポジトリと同じフォルダに置いた各リポジトリから読む。2026-11-09 に hino-town-docs を c1e4382 に上げ、令和3〜8年度の補正予算の検収の台帳・原典の誤りの記録と、主な内容の行（hosei-maru.tsv。繰越明許費のみの回を確かめるため）を足した。",
+  "note": "tools/build_data.py が読む材料。各リポジトリを git pull したあとの HEAD で固定した（2026-11-06。附表の検収の完了と読みの注の版に上げた）。hino-town-docs は 2026-11-08 に構造化の層（data/struct/）を足し、data/sources.tsv も同じ commit に上げた（CI はリポジトリごとに commit を1つだけ取り出すため）。材料は、このリポジトリと同じフォルダに置いた各リポジトリから読む。2026-11-09 に hino-town-docs を c1e4382 に上げ、令和3〜8年度の補正予算の検収の台帳・原典の誤りの記録と、主な内容の行（hosei-maru.tsv。繰越明許費のみの回を確かめるため）を足した。 2026-11-12 に hino-town-docs を bb08df7 に上げ、「決算と監査」の画面のために、決算の内訳（kessan-uchiwake.tsv）とその原典の誤りの記録、監査の結果の報告・事項の表と検収の台帳、監査の結果の文字の層（data/text/kansa-*.txt。台帳の check が ok の80本）、令和3〜6年度の財政状況資料集の総括表の文字の層（注釈の字を確かめるため）を足した。",
   "inputs": [
     {
       "repo": "kken78/shiga-hino-plans",
@@ -135,135 +135,669 @@
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/sources.tsv",
-      "sha256": "f92f56792075d4ceb91a1dc6135a892ec6974e2d99dbc4867c1914b1252ef22b"
+      "sha256": "e687e73e204fc1f6890076ff81998cf0d246785aa5c428de8b58b8d23578bb30"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/hosei-kai.tsv",
       "sha256": "e219287a986fc7d3dd7342724109cedbcc133a56da469b5187ff41e314932040"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/hosei-shiryo.tsv",
       "sha256": "a5726b5b82b4691af124ae4d90aab7b60ca5d77bdf0e30ceea2fb531b90a19b4"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/hosei-kan.tsv",
       "sha256": "b0d2eff57cf7d128f80b5581ec878ece80448777f37ab0b2080a22f9c0d17a1f"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/hosei-kaikei.tsv",
       "sha256": "0fa181388826856581c4dd78792c8bf6a648c79c136258d2e220f74923bcb2ac"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/hosei-maru.tsv",
       "sha256": "b4f6615c23ee843307fb016fe9afbf497a94a0be59e12d3830933588d8a1da16"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/kessan-kai.tsv",
       "sha256": "dd48805f89b3e01e66895d6a20252cfb96d71f2fda21cb8dfe3a7c59337270b5"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/kessan-gaku.tsv",
       "sha256": "87ac605546971474ff3ffe02f8d5ef8422a6bb95c9dd4c9bb407bf6b56555ccf"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/zaisei-shihyo.tsv",
       "sha256": "0d119454ccad14b44229951f6c02fc4f386004e4eb2e9631acc36bcb5b1e9dbd"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/zaisei-ichi.tsv",
       "sha256": "752ba0a1002fda1600bb53e1d00122cd6ae9404aae65b1823dff99fd0ab4204a"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/hosei-r3.tsv",
       "sha256": "5140bb29ef6f4a7f3896886f52ebe4936fd36c165394ff76ba62ba9734f461d1"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/hosei-r4.tsv",
       "sha256": "30d0ba2e9ff0ff7d12bdccdea3320e2d133f00bf9af1b2acc2f362e323b58d8e"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/hosei-r5.tsv",
       "sha256": "3e2b904c4771721df8dc5b28e52f22cce65de8abc105e7942cb8d3a4ea2785fe"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/hosei-r6.tsv",
       "sha256": "43a724c91327e7c8a15be7a25137bdef003631de6f23e5d9c5b192ba36e3f6f1"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/hosei-r7.tsv",
       "sha256": "44045e143cda53da4bdb300ff9dd4ea2f59a7540d15db4cc8022c1512f667830"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/hosei-r8.tsv",
       "sha256": "06926e7397e578694ade13d07e73d7957b02691badd461bd623372aca2358508"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/kessan.tsv",
       "sha256": "f76323aa88920cf3be681242917206b4c481c1733236970d77442b67e33ba6c6"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/audit/zaisei.tsv",
       "sha256": "baeadcf416b332aabb005ef35256aec948d98c618b0fa16e914153eb3da6bc1a"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/issues/yosan-r5-hosei-02.tsv",
       "sha256": "ad0000017b402df252c02e1200c6d1ee486e1c50c9a2dd942de4f2725b22f4aa"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/issues/yosan-r6-hosei-09.tsv",
       "sha256": "f625ca1f1a2a479594203e04336e9e19903e1ca23f022193c665b874be8995d4"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/issues/yosan-r7-hosei-09.tsv",
       "sha256": "a2c5955b563c8a18c27f1350335c85e2df01b20cf67a04fc2df5bd5f7af137f6"
     },
     {
       "repo": "kken78/hino-town-docs",
-      "commit": "c1e4382dbbceb51b3030b47683809010c5590266",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
       "path": "data/struct/issues/yosan-r8-hosei-06-tsuika.tsv",
       "sha256": "61ad3e5968db235c0ff3393b0723855ddead6535d931fbdaf325c08df6898793"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/struct/kessan-uchiwake.tsv",
+      "sha256": "16a6c4dc11a8ae0de53350c8caee09d769f7b52defc76c2a759e9e9932a9c76a"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/struct/issues/kessan-r3-gaiyou.tsv",
+      "sha256": "dc0f6d05665135f8227d8c53302be9b82b8ea4fcb381884c3dca4a1d97191b89"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/struct/kansa-kekka.tsv",
+      "sha256": "42a4d3e6e26e64a3e8870cfc9060516d66cf81a974e5930ae4083c7649f8364f"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/struct/kansa-jiko.tsv",
+      "sha256": "e426232f286bab297e93f0e6d9346cd8056a63dd31765cb8f5de168905a3f97d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/struct/audit/kansa.tsv",
+      "sha256": "6e1b3d93d3f5ef3c1d46135564c58d44a348f256fcc15b88ed87c988353f8f05"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/zaisei-r3-shiryoshu/01.tsv",
+      "sha256": "dc546efc416a2f72a11ed28ce6de8116c961a7e41cdaeed6a4e107bc5da52abf"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/zaisei-r4-shiryoshu/01.tsv",
+      "sha256": "2c63699f6e020b4e16dd0f2d6b0c19f40408f081e1df4565c81772aad5639dc6"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/zaisei-r5-shiryoshu/01.tsv",
+      "sha256": "b51b7535fb6e516a5b288a327fd5bba0ae3345400b2640527c44e9e333b2fe8a"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/zaisei-r6-shiryoshu/01.tsv",
+      "sha256": "f9cb55a1bb42a8bd744bdcfb0754fb32790df3921526af35e2cf36145c3e7a5f"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r3-14.txt",
+      "sha256": "cc51cd162637807174575d73e1510012830d3a0c92e67fddb23b3b385c26593d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r3-15.txt",
+      "sha256": "845b764d5944be821cac13d31ce0fe193e5153f0c81890399be67ec366074145"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-01.txt",
+      "sha256": "54e78d73a5c6acb8e2f5242674a4325ee6ab28db7352bb19ed05ed17096bed36"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-02.txt",
+      "sha256": "2523558683e0097eb2266587c2bf53b09bd4b946ca02d0227b6efbfb1f8d7895"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-03.txt",
+      "sha256": "1f4171a741a2474bd77fa69a79a5cd5eb5f4a65e29b2872076cf5ff7e6bf7b08"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-04.txt",
+      "sha256": "9b36986e68e6846d7208355e1a89481c4d9ec390f4fd3867d27fbb151b4bbdfb"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-05.txt",
+      "sha256": "2f326423604bb46413c543ac02e1a467475310ba8c5b31c65411344e3654b163"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-06.txt",
+      "sha256": "a35c0b999c48dcb748d275bc9dad5ff94de532638156ba8d69199355d5575bd3"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-07.txt",
+      "sha256": "99e53a85735057af3b7b138e22174e25dcf280fe6e067e0bf6642b0f2beae200"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-08.txt",
+      "sha256": "2cdd942c90ed20db1292e3674082c7132fe80d0f6e444a1946e57d8b71b982eb"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-09.txt",
+      "sha256": "6492ef376228b9c16a47fb53e62383a49f4e8631741a4a75052a8ece671a38a0"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-10.txt",
+      "sha256": "2f670e22ac463c1730d1d60a2d748067b4a96ada00828f7e6f1409a1609cff56"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-11.txt",
+      "sha256": "c6b2fe2f0c16aaf932b90913cafb6d14f1a319bcaf04b9687dc839559fcc1f3e"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-12.txt",
+      "sha256": "90e4544eb72fd331cf5b69df1c827edf821976c6f441bbe2cf58d5c4c92ca6f5"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-13.txt",
+      "sha256": "92bea7737cda7f57b58bef00a89165d799169460a4a35ffb7c6f08c8b485fd9d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-14.txt",
+      "sha256": "b88eb14f02a486220f5ad267165dd472c12c3431636e85e40b75b6853ce83a77"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-15.txt",
+      "sha256": "294b7ad53aff9e4886a66620d2eae3a02b3de2299583b6ecb9b962555d0bd86f"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-16.txt",
+      "sha256": "9da4aa018a6e0ca32257c736afd8872c214ec041311a1ba0764ed373976904bc"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-17.txt",
+      "sha256": "4a2ed7e84a285fc7c474934518ea1ac5717882f52c30066872b51f8f626a86bc"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-18.txt",
+      "sha256": "4265a6caf0bf96ce06f4e9dd77ab4c52678d6e11ae2c7407d617286ead86097e"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r4-19.txt",
+      "sha256": "33d4cbf28e04e1bf7baad9348aa391b693dddb020658fc78d965a9e4703f376e"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-01.txt",
+      "sha256": "9b95d04c23f8fd61b90555b787ccd26d301c7c838413e1165f62dc313d06095a"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-02.txt",
+      "sha256": "e54ec15c738c7b14faa4ffd742b86bf1cdcadad49a331ea33c4f6d8143f82ae5"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-03.txt",
+      "sha256": "c54ec397c383d3159e7b668fb7dc78284abb9a7cd5d078354c5fe92b50a37d0f"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-04.txt",
+      "sha256": "19b049da96582b1772b95b3e1bed3f5a734b080314a5ef8cd40644730c086b6d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-05.txt",
+      "sha256": "30f487e04d68589f2486f382f5131af169ec95addfd5b7de79b7aa218afd4398"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-06.txt",
+      "sha256": "883cdd461392b7ccf50d1242c8f86cd7a354961f6a3d86291cb64bff81f777f1"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-07.txt",
+      "sha256": "d4c3b10e2c1037c0aaf1383c53cbd52db33707a6ad8535d261d754bc4e4894db"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-08.txt",
+      "sha256": "18976eff7323006924fdc577d8f4ab9d18cb7840c161018c33b81bc2a455a781"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-09.txt",
+      "sha256": "f550ad9c2034e07b6cc693ee2e0ec63be450c8da3535bb87d514c72d67de6f4e"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-10.txt",
+      "sha256": "9c81adb5699e4295ae476dfc493c2f5b2793a449c35305838574a82b21655418"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-11.txt",
+      "sha256": "481b86af5d553cf2d8c536b5937f57f41ef2437437c66102066ef1b7d00ff358"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-12.txt",
+      "sha256": "b9f3325541c6e41b5cf64866773c4ad1d61efcd3f14d716e18863927993b0df1"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-13.txt",
+      "sha256": "59da1f4ac5e961fe3d3796a82615e25073952926f764379861c71178d6e0c153"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-14.txt",
+      "sha256": "694ca081272505c12f3e7e1dc6a1cd0ce89e1766fc685dfae3ca6b39644dc8e8"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-15.txt",
+      "sha256": "f692d88315cde7c4f43664879387597382c7392b937d78dd2b82be35c2dfff88"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-16.txt",
+      "sha256": "51bae11987a430f0e5215829d9617fe8964846ec1d334bc0731a6715a0db75fe"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-17.txt",
+      "sha256": "6bb642046963ce2dd1f0ae6fdad973566605157af5f7563553f1dd8dd81836ce"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-18.txt",
+      "sha256": "f35840844f4c15aea33339d458202bf5a3679167368571ecb7db7ad94eaee8ff"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-19.txt",
+      "sha256": "0050e09b145ab6b7f42633f8d65359ef5cef5b7971532eb9aed7ab32f70fe41d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r5-20.txt",
+      "sha256": "4c62e9ed4f5ea108a52e0e92bb1a4793c53524ccb6152e1314d974b4461ac671"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-01.txt",
+      "sha256": "c4528ca2ee24b204059792856cbcc6d995965095c3bcd547e028ae6daf12106e"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-02.txt",
+      "sha256": "0d3f2dbea736916daaa1e831dda8fbcb2bb98156b361a96fcb50bea74a6ee2cb"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-03.txt",
+      "sha256": "8b5a2e0712b639e891e2a296145ec5f9792b7d73be4e6862e9e560cb20a6178c"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-04.txt",
+      "sha256": "6b03205000cd05ea5a9511a0ce43074119f8eb5788f28dccb880c2a3f50aa60d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-05.txt",
+      "sha256": "936c5e11d76d4ee3f28f16b77dd260014417f10a7a67c01411eec532db78bb9c"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-06.txt",
+      "sha256": "8848f0dc4cc5b4f538e0ca2699dc2748512c5396dc89dea179deb3438f8d10dd"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-07.txt",
+      "sha256": "6a30457ea23c9fc174073d7be3de366a31440af32fc6f0be66d2e7128fe1b003"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-08.txt",
+      "sha256": "83bcf622ec600fe1d25b3eaf14ddff5ad5d6abb4f24e52eac005ac47be7d4dc3"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-09.txt",
+      "sha256": "a9c569a0d3600060766d866bfbf58209298daffe7af6264c9650e6039e2afa53"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-10.txt",
+      "sha256": "0ddc6454d20e8e912fa73c54dafe61ac907a0e91076cddea73a2a00f32106dd0"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-11.txt",
+      "sha256": "171d0e37bad2a9c7a39f8a0643c1fa6ecd328c132719e23459b98bfa2f3cf210"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-12.txt",
+      "sha256": "7d076e1942bedfe1a11c09d1bfa6bce67a8dc8f588a49fdded4f17487d4f8b78"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-13.txt",
+      "sha256": "5e90d9364780b5cdd2d226c99c29aeeb64c995298274d6508bb115f94ed13e88"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-14.txt",
+      "sha256": "fb0e33a39ca60b057c290a6241198b808ab4b3280ec10e3a9bbafa3f7460da3c"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-15.txt",
+      "sha256": "003a393625cf313e8efb146b86da3ca842de68d00a9e72028555e18a4494b5e2"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-16.txt",
+      "sha256": "383a09ccf9b747c5a955a870decfba5f7eaf1e966288897a96dc69093d1eb0e2"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-17.txt",
+      "sha256": "5c1e09c66b92845832ec05e2eb96a06d4b57f03b20a9070e730993325cc09b51"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-18.txt",
+      "sha256": "997659c0f384eaae9e64f28b419761878c9210c28f901ad3ad2eebf072d01282"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r6-19.txt",
+      "sha256": "04e8d3e3eebe4094ee508e5559c220763b2371aa54a35c3c1cba0b587bfc2831"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-01.txt",
+      "sha256": "b4ce2fe5d7c5ffbc91c4efa913eca4db4404e0dd4c654abb4a2914a9455a6c1e"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-02.txt",
+      "sha256": "f345b3eea4b24e83a1bcb4635e6d651f68c0283d2dbea4cf768d74c4a0ef6343"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-03.txt",
+      "sha256": "ce62d22162a8b4ace536529bbecc483dc5a70c3f21dc755893e8f4968e3f6d25"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-04.txt",
+      "sha256": "d4967ab87dada39a2b6c78845b3c2d9c07c339111b90d3d132014a8588938ce2"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-05.txt",
+      "sha256": "8d605138c4bbcf9f48631e302b8d133213f56611fde609573f757dc034636e7c"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-06.txt",
+      "sha256": "4b12dc12c8c0be1fa68b87f103f6f5d7582cb5811dda3e426b2630822b488c7c"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-07.txt",
+      "sha256": "8e7ef34764c30af7be6b5a7cfc4ae8bb12b8bc1911c18dd1bad2c0e498974dc3"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-08.txt",
+      "sha256": "99246b7c4c1521256e0435fd9f2abfccf9ef1ce200aaa1272eba5e821d323541"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-09.txt",
+      "sha256": "82ab18f645236fc1c771917f22a7f6fc414aae43d7c55a020070059500adfc06"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-10.txt",
+      "sha256": "9133369f486f098caa9fb022623d5060b34274e505364fa89e307b57e391e42b"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-11.txt",
+      "sha256": "5492b29cf6fc27f2082fde786bbc1dd403a5d08e4fb3044d1963e4b827bfcf7b"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-12.txt",
+      "sha256": "5aac23d27f8a55f5fd940885ebb44364e3914da4cbc6dad00b05fb52ba8cb9cb"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-13.txt",
+      "sha256": "c99a7ff2b1e7945a5cf4c09472bed10abdcdbecf93c0f0eb3031e93487298bb5"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-14.txt",
+      "sha256": "0b39b80d15aa103faa66bf87271a7a687e6e1298c38b45b2c7177b63eb8dbd06"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-15.txt",
+      "sha256": "aaf584822c1abbafedd556d75d0bd101604f68ab3f8d20da51aad3cd47a8d708"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-16.txt",
+      "sha256": "ede78879cff6c91b2f3173908aac0ea2747e5871fe7fe17a5430dd1c03d013ca"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-17.txt",
+      "sha256": "874a3341990d918b30fc5dfefa3b3d1a45bec478d812de880721a55faa98f880"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-18.txt",
+      "sha256": "9d4e426ac9103dd649e5b7bce9cb4e1e2201686983813d1af92e9d707ab8345d"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-19.txt",
+      "sha256": "017107796cbbd057b6f5f807cc92398d564d1935824088ebe42a880965915a29"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bb08df7d61e7939128b078131238429d07739c2d",
+      "path": "data/text/kansa-r7-20.txt",
+      "sha256": "239c3789611a08d3db98b57476d88865978c23d9252fd333a664f431855a3d21"
     }
   ]
 }

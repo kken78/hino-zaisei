@@ -194,6 +194,49 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 .zs-card dd{overflow-wrap:anywhere}
 .zs-card .src{font-size:var(--fs-xs);color:var(--muted);margin-top:6px}
 #tZs th,#tZs td{padding:7px 8px}
+/* 決算と監査（DESIGN.md ADR-8） */
+.kk-years{margin-bottom:0}
+section.kk-top{padding-top:16px}
+section[hidden]{display:none}
+#kkMiss{margin-top:8px}
+#kk-uchiwake{padding-top:20px}
+.kk-years button{padding:6px 10px}
+.kk-more{margin-top:10px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;font-size:var(--fs-xs);color:var(--ai);min-height:42px}
+#kk-kansa{padding-top:24px}
+@media (max-width:767px){.kk-years .lbl{display:none}#kk-kansa .card{padding-top:12px}}
+.kk-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kk-side h3{font-size:var(--fs-md);color:var(--ai-ink);margin-bottom:4px}
+.kk-side h4{font-size:var(--fs-sm);color:var(--ai-ink);margin:12px 0 4px}
+.kk-bars{display:grid;gap:4px}
+.kk-bar{display:grid;grid-template-columns:minmax(0,9em) minmax(0,1fr) auto;gap:2px 10px;align-items:center;font-size:var(--fs-xs)}
+.kk-bar .nm{overflow-wrap:anywhere}
+.kk-bar .vl{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kk-bar .bar{height:12px}
+.kk-bar .bar i{background:var(--portal-ai)}
+.kk-bar.naka .nm{font-weight:700}
+.kk-bar.naka .bar i{background:var(--ai-ink)}
+.kk-sum{font-size:var(--fs-xs);color:var(--muted);margin-top:6px}
+.kk-none{font-size:var(--fs-sm);padding:4px 0}
+table.kk td.txt{min-width:8em}
+.kk-ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kk-row{border-bottom:1px solid var(--line)}
+.kk-row summary{display:block;padding:12px 4px;cursor:pointer;list-style:none}
+.kk-row summary::-webkit-details-marker{display:none}
+.kk-row summary:hover{background:#F7F9FC}
+.kk-row .it-name{display:block}
+.kk-row[open] .it-name::before{transform:rotate(90deg)}
+.kk-tt{color:var(--ai-ink)}
+.kk-plain{padding:12px 4px 12px 18px}
+.kk-date{font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;margin-right:8px}
+.kk-jiko{display:block;font-size:var(--fs-xs);color:var(--ink);margin:4px 0 0 14px;padding:0;list-style:none}
+.kk-jiko li{overflow-wrap:anywhere;padding:1px 0}
+.kk-body{padding:4px 4px 18px 18px;font-size:var(--fs-sm)}
+.kk-body p{margin-bottom:8px;overflow-wrap:anywhere}
+.kk-body h4{font-size:var(--fs-sm);color:var(--ai-ink);margin:12px 0 4px}
+.kk-body .it-dl{margin-top:10px}
+.tag.kk{color:var(--ink);border-color:var(--muted)}
+svg.ext{width:14px;height:14px;vertical-align:-2px;margin-left:2px}
+@media (max-width:767px){.kk-two{grid-template-columns:1fr}.kk-bar{grid-template-columns:minmax(0,1fr) auto}.kk-bar .bar{grid-row:2;grid-column:1 / -1}}
 @media (max-width:820px){.kpis{grid-template-columns:1fr 1fr}.learn,.two,.trend{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.zs-grid{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.zs-grid{grid-template-columns:1fr}}
 @media (max-width:640px){.kpis .kpi:nth-child(-n+2){grid-column:1 / -1}.card{padding:16px 14px}.trend-card{padding:8px 8px 6px}.pl{grid-template-columns:minmax(0,1fr) auto}.pl .pl-name{grid-column:1 / -1}.pl .bar{grid-row:2;grid-column:1}.pl .pl-val{grid-row:2;grid-column:2}.it-dl{grid-template-columns:1fr}.it-dl dt{margin-top:4px}}
@@ -258,7 +301,7 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <!-- portal-shared:siblings end -->
 </div></div>
 
-<div class="tabbar"><div class="wrap"><div class="tabs" role="tablist" aria-label="このページの画面"><button type="button" class="tab" role="tab" id="t-zaisei" aria-controls="p-zaisei" aria-selected="false" tabindex="-1">財政指標と予算の規模</button><button type="button" class="tab" role="tab" id="t-tosho" aria-controls="p-tosho" aria-selected="true" tabindex="0">当初予算</button><button type="button" class="tab" role="tab" id="t-list" aria-controls="p-list" aria-selected="false" tabindex="-1">事業の一覧</button><button type="button" class="tab" role="tab" id="t-kozo-ugoki" aria-controls="p-kozo-ugoki" aria-selected="false" tabindex="-1">補正予算と決算</button><button type="button" class="tab" role="tab" id="t-shogo" aria-controls="p-shogo" aria-selected="false" tabindex="-1">照合とデータ</button></div></div></div>
+<div class="tabbar"><div class="wrap"><div class="tabs" role="tablist" aria-label="このページの画面"><button type="button" class="tab" role="tab" id="t-zaisei" aria-controls="p-zaisei" aria-selected="false" tabindex="-1">財政指標と予算の規模</button><button type="button" class="tab" role="tab" id="t-tosho" aria-controls="p-tosho" aria-selected="true" tabindex="0">当初予算</button><button type="button" class="tab" role="tab" id="t-list" aria-controls="p-list" aria-selected="false" tabindex="-1">事業の一覧</button><button type="button" class="tab" role="tab" id="t-kozo-ugoki" aria-controls="p-kozo-ugoki" aria-selected="false" tabindex="-1">補正予算と決算</button><button type="button" class="tab" role="tab" id="t-kessan-kansa" aria-controls="p-kessan-kansa" aria-selected="false" tabindex="-1">決算と監査</button><button type="button" class="tab" role="tab" id="t-shogo" aria-controls="p-shogo" aria-selected="false" tabindex="-1">照合とデータ</button></div></div></div>
 
 <div class="hero" id="hero">
 <div class="wrap">
@@ -384,6 +427,47 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 </section>
 </div>
 
+<div class="tabpanel" role="tabpanel" id="p-kessan-kansa" aria-labelledby="t-kessan-kansa" tabindex="0" hidden>
+<section id="kessan-kansa" class="kk-top">
+<div class="wrap">
+<div class="ky-years kk-years" role="group" aria-label="決算と監査の年度。選んだ年度で下の3つの節が切り替わります" id="kkYears"><span class="lbl">年度を選ぶ（下の3つの節が切り替わります）</span></div>
+<p class="src-note" id="kkMiss" hidden></p>
+</div>
+</section>
+
+<section id="kk-uchiwake">
+<div class="wrap">
+<div class="sec-head"><h2 id="kkUwH2">決算の内訳（一般会計）</h2>
+<p>各年度の「決算の概要」の円グラフの項目と額（万円）です。</p></div>
+<div class="card" id="kkUw"></div>
+</div>
+</section>
+
+<section id="kk-kenzenka">
+<div class="wrap">
+<div class="sec-head"><h2 id="kkKzH2">健全化判断比率と資金不足比率</h2>
+<p>「財政状況資料集」の比率と基準です。</p></div>
+<div class="card" id="kkKz"></div>
+</div>
+</section>
+
+<section id="kk-kansa">
+<div class="wrap">
+<div class="sec-head"><h2 id="kkKsH2">監査の結果</h2>
+<p>行を押すと結果の文を表示します。</p></div>
+<div class="card">
+<div class="kk-ctl">
+<div class="seg" role="group" aria-label="監査の種類で絞り込む" id="kkKind"></div>
+<div class="seg" role="group" aria-label="並びの向き" id="kkOrder"><button type="button" data-ord="desc" class="is-on" aria-pressed="true">新しい順</button><button type="button" data-ord="asc" aria-pressed="false">古い順</button></div>
+</div>
+<div class="items" id="kkKs"></div>
+<p class="src-note" id="kkKsLead"></p>
+<p class="src-note" id="kkKsNote"></p>
+</div>
+</div>
+</section>
+</div>
+
 <div class="tabpanel" role="tabpanel" id="p-shogo" aria-labelledby="t-shogo" tabindex="0" hidden>
 <section id="shogo">
 <div class="wrap">
@@ -425,6 +509,9 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <p>決算の事業ごとの数字（主要な施策の成果を説明する書類など）は町のホームページで公開されていないため、事業の単位の決算は載せていません。決算は会計の単位までです。</p>
 <p>補正予算と決算の画面は、令和3〜8年度です。決算は決算審査意見書のある令和3〜7年度だけで、令和8年度は取り込んだ補正予算の回までです。最初に開く年度は、数字を書き写してある一番新しい年度（いま進んでいる年度）です。会計は、その年度の補正予算の概要の特別会計の表・企業会計の表にあるものです（令和3・4年度は簡易水道特別会計と農業集落排水事業特別会計を含みます）。</p>
 <p>財政指標の総括表の値は普通会計の値で、「補正予算と決算」の一般会計の決算の額とは範囲が違います。</p></div>
+<div class="card"><h3>決算と監査</h3>
+<p>令和3〜7年度。決算の内訳は令和3〜6年度の「決算の概要」（PDF）の一般会計の円グラフの額（万円）、健全化判断比率と資金不足比率は令和3〜6年度の「財政状況資料集」（Excel）の値です。どちらも照合の済んだ数字だけを使います。</p>
+<p>監査の結果は、各年度の「監査等の結果」の報告（PDF）です。文字を取り出せない形の PDF（令和3年度の16件）と、照合がまだ済んでいない報告は、題と PDF へのリンクだけです。令和元・2年度は載せていません。</p></div>
 <div class="card"><h3>使った資料の版</h3>
 <p>このページは、次のリポジトリの決まった版のデータから作っています。当初予算の総額と会計ごとの額は、このリポジトリで原典の PDF の文字とページの画像に照らして転記し、会計ごとの額の和が合計と合うことと、出典の URL・ファイルの大きさ・sha256（ファイルの中身を確かめる値）が hino-town-docs の資料の一覧と合うことを確かめています。</p>
 <p id="inputsText"></p></div>
@@ -438,8 +525,8 @@ tr.is-on th,tr.is-on td{background:#F2F6FC}
 <footer class="portal-foot"><div class="portal-wrap">
 <dl>
 <dt>このページについて</dt><dd><p>このページは、滋賀県日野町 政策参与の東健二郎が、個人として作成した試作です。日野町の公式のサイトではなく、町の見解を示すものでもありません。</p><p>日野町の各年度の「当初予算の概要」の附表に載った事業を、原典と照らして転記し、柱・款・担当課ごとに集計しています。令和3〜8年度の補正予算と令和3〜7年度の決算の額と、財政指標は、hino-town-docs で原典の数字を表の形に書き写し、原典と照らしたものから載せています。</p></dd>
-<dt>出典</dt><dd>日野町の各年度の「予算」のページ（例 <a href="https://www.town.shiga-hino.lg.jp/0000008534.html">令和8年度予算</a>）にある「当初予算の概要」と、その附表「令和○年度に取り組む主な事業」（どちらも PDF）。令和3〜8年度の各回の「補正予算の概要」と、令和3〜7年度の「決算審査意見書」（PDF）。平成27〜令和6年度の「財政状況資料集」（Excel）。年度ごとのリンクは、上の「データについて」と各節の表にあります。</dd>
-<dt>資料の時点</dt><dd>令和3〜8年度の各年度の当初予算、令和3〜8年度の補正予算（令和8年度は9月補正まで）と令和3〜7年度の決算、平成27〜令和6年度の財政状況資料集。原典の取得日は2026年10月19日から11月7日です（年度ごとの日付は「データについて」）。このページは、2026年11月6日時点の資料（補正予算・決算・財政指標は2026年11月9日時点）から作っています。</dd>
+<dt>出典</dt><dd>日野町の各年度の「予算」のページ（例 <a href="https://www.town.shiga-hino.lg.jp/0000008534.html">令和8年度予算</a>）にある「当初予算の概要」と、その附表「令和○年度に取り組む主な事業」（どちらも PDF）。令和3〜8年度の各回の「補正予算の概要」と、令和3〜7年度の「決算審査意見書」（PDF）。平成27〜令和6年度の「財政状況資料集」（Excel）。令和3〜6年度の「決算の概要」と令和3〜7年度の「監査等の結果」（PDF）。年度ごとのリンクは、上の「データについて」と各節の表にあります。</dd>
+<dt>資料の時点</dt><dd>令和3〜8年度の各年度の当初予算、令和3〜8年度の補正予算（令和8年度は9月補正まで）と令和3〜7年度の決算、平成27〜令和6年度の財政状況資料集、令和3〜6年度の決算の概要、令和3〜7年度の監査等の結果。原典の取得日は2026年10月19日〜11月12日（年度ごとの日付は「データについて」）。2026年11月6日時点の資料（補正予算・決算・財政指標は11月9日、決算と監査は11月12日時点）から作成。</dd>
 <dt>注意</dt><dd><p>内容の正確性を保証するものではありません。最新・正確な情報は日野町の公式ページでご確認ください。</p><p>事業名・金額などは公表資料からの転記です。<a href="https://www.town.shiga-hino.lg.jp/">日野町ホームページ</a></p></dd>
 <dt>データ</dt><dd><a href="https://github.com/kken78/hino-zaisei/blob/main/data.js">data.js</a>（このページで使うデータ）、<a href="https://github.com/kken78/hino-zaisei/tree/main/data">data/</a>（予算の規模の JSON）、<a href="https://github.com/kken78/hino-zaisei/blob/main/inputs.lock.json">inputs.lock.json</a>（使った資料の版の記録）。附表の事業の JSON は <a href="https://github.com/kken78/shiga-hino-plans/tree/main/data/fuhyo">shiga-hino-plans の data/fuhyo/</a>、補正予算・決算・財政指標の表は <a href="https://github.com/kken78/hino-town-docs/tree/main/data/struct">hino-town-docs の data/struct/</a> にあります。</dd>
 <dt>ソースコード</dt><dd><a href="https://github.com/kken78/hino-zaisei">kken78/hino-zaisei</a>（GitHub）</dd>
@@ -563,8 +650,8 @@ function drawPillars(){
   document.getElementById('plTitle').textContent = (plMode === 'amt' ? '柱ごとの予算額' : '柱ごとの件数') + '（' + Y[FY].label + '）';
 }
 /* タブ（ADR-7）。#〈タブの名前〉か、節の id（#trend・#totals など）で開ける */
-const TABS = ['zaisei', 'tosho', 'list', 'kozo-ugoki', 'shogo'];
-const SEC_TAB = {trend: 'tosho', totals: 'zaisei'};
+const TABS = ['zaisei', 'tosho', 'list', 'kozo-ugoki', 'kessan-kansa', 'shogo'];
+const SEC_TAB = {trend: 'tosho', totals: 'zaisei', 'kk-uchiwake': 'kessan-kansa', 'kk-kenzenka': 'kessan-kansa', 'kk-kansa': 'kessan-kansa'};
 function showTab(k, opt){
   opt = opt || {};
   TABS.forEach(t => {
@@ -950,6 +1037,136 @@ document.getElementById('zsCards').innerHTML = ZI.items.map(o => {
 document.getElementById('zsNote').innerHTML = '出典は各年度の「財政状況資料集」（Excel）：' + ZY.map((y, i) => docA({url: ZI.docs[i].url}, ZYS(y))).join('・') +
   '。表の見出しの H は平成、R は令和です。値は原典の桁のままです。財政力指数は単位の無い指数です。前の年度との差は、この表の前の年度の値との差です。類似団体内順位は「順位／類似団体の数」で、類似団体の数は年度で違います。類似団体内平均値は、原典ではグラフの値だけなので載せていません。';
 document.getElementById('zsAudit').innerHTML = '原典との照合：hino-town-docs の照合の記録による。' + auText(AU.zaisei, '財政指標') + '。';
+
+/* 決算と監査（DESIGN.md ADR-8）。年度のボタンで3つの節をそろえて切り替える */
+const KK = B.kk;
+const EXT = '<svg class="ext" viewBox="0 0 16 16" role="img" aria-label="新しいタブで開きます"><path d="M7 3H3v10h10V9M9.5 3H13v3.5M13 3L7.5 8.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+const extA = (url, text) => '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + text + EXT + '</a>';
+const fsize = b => b >= 1048576 ? (b / 1048576).toFixed(1) + 'MB' : Math.round(b / 1024) + 'KB';
+const KKL = y => '令和' + y + '年度';
+let KKY = Math.max(...KK.years), kkKind = '', kkOrd = 'desc', kkAll = false;
+const KS_FIRST = 10;   /* 一覧は最初の10件を出し、残りは「残りを表示」で開く（DESIGN.md ADR-7 のページの長さの目安） */
+const kkYearsBox = document.getElementById('kkYears');
+kkYearsBox.insertAdjacentHTML('beforeend', KK.years.map(y => '<button type="button" data-kk="' + y + '" aria-pressed="false">' + KKL(y) + '</button>').join(''));
+kkYearsBox.addEventListener('click', e => { const b = e.target.closest('[data-kk]'); if (b) { KKY = Number(b.dataset.kk); drawKk(); } });
+/* 照合の件数（hino-portal DESIGN.md 6.6 の用語で書く） */
+const kkAu = (a, label, what) => a ? '原典との照合：' + '<a href="' + esc(TD_BLOB + a.file) + '" target="_blank" rel="noopener">' + label + 'の照合の記録' + EXT + '</a>による。使った' + what + ' ' + nu(fmt(a.n) + '件') + 'はすべて照合済み（' +
+  [['プログラムによる原典の文字との照合 ', a.a], ['機械による検算 ', a.k], ['AI（2回）', a.b], ['人 ', a.c]].filter(x => x[1]).map(x => x[0] + nu(fmt(x[1]) + '件')).join('、') + '）。' : '';
+
+/* 決算の内訳（一般会計） */
+const UW_SIDE = [['sainyu', 'sainyu-naka', '歳入'], ['seishitsu', 'seishitsu-naka', '歳出（性質別）'], ['mokuteki', null, '歳出（目的別）']];
+const byVal = a => a.slice().sort((x, y) => y.value - x.value);
+function uwBars(list, total, cls){
+  return '<div class="kk-bars">' + list.map(o => '<div class="kk-bar' + cls + '"><span class="nm">' + esc(o.name) + '</span><span class="bar" aria-hidden="true"><i style="width:' + (o.value / total * 100).toFixed(2) + '%"></i></span>' +
+    '<span class="vl">' + nu(fmt(o.value) + '万円') + (o.ratio ? ' ' + nu(esc(o.ratio) + '%') : '') + '</span></div>').join('') + '</div>';
+}
+function drawUw(){
+  const U = KK.uchiwake[String(KKY)], box = document.getElementById('kkUw');
+  document.getElementById('kkUwH2').textContent = '決算の内訳（一般会計、' + KKL(KKY) + '）';
+  if (!U) { box.innerHTML = '<p class="kk-none">' + KKL(KKY) + 'の決算の概要（一般会計の歳入と歳出の内訳）は、まだこのページに載せていません。</p>'; return; }
+  const G = U.groups, sides = UW_SIDE.filter(sd => G[sd[0]]);
+  const notes = [], trs = [];
+  const cards = sides.map(([out, inn, label]) => {
+    const items = byVal(G[out]), total = items.reduce((t, o) => t + o.value, 0);
+    const naka = inn && G[inn] ? byVal(G[inn]) : [];
+    const pages = [...new Set(items.concat(naka).map(o => o.page))];
+    const dup = [...new Set(items.map(o => o.name).filter((n, i, a) => a.indexOf(n) !== i))];
+    if (dup.length) notes.push(label + 'の「' + dup.map(esc).join('」「') + '」は、原典で2つの項目に同じ名前が付いています（原典の字のまま）。');
+    items.concat(naka).filter(o => o.issue).forEach(o => notes.push(label + 'の' + esc(o.name) + 'の額の原典の字は<q>' + esc(o.raw) + '</q>です（' + esc(o.issue.issue) + '。<a href="' + esc(TD_BLOB + o.issue.file) + '" target="_blank" rel="noopener">原典の誤りの記録' + EXT + '</a>）。表と図の額は、原典のページの画像と内訳の和で確かめた値です。'));
+    naka.forEach(o => trs.push('<tr><th scope="row">' + label + '</th><td class="txt"><b>' + esc(o.name) + '</b></td><td>' + fmt(o.value) + '</td><td>' + esc(o.ratio) + '</td><td>' + o.page + '</td></tr>'));
+    items.forEach(o => trs.push('<tr><th scope="row">' + label + '</th><td class="txt">' + esc(o.name) + '</td><td>' + fmt(o.value) + '</td><td>' + esc(o.ratio) + '</td><td>' + o.page + '</td></tr>'));
+    return '<div class="kk-side" role="group" aria-label="' + KKL(KKY) + 'の一般会計の' + label + 'の内訳（決算）の棒グラフ。数値の表は下にあります"><h3>' + label + '</h3>' +
+      (naka.length ? uwBars(naka, total, ' naka') + '<h4>項目</h4>' : '') + uwBars(items, total, '') +
+      '<p class="kk-sum">項目の額の和 ' + nu(fmt(total) + '万円') + '（計算した値）。原典 ' + pages.map(n => nu(n + 'ページ')).join('・') + '</p></div>';
+  });
+  box.innerHTML = '<div class="kk-two">' + cards.join('') + '</div>' +
+    '<details class="alt"><summary>数値の表を開く（' + KKL(KKY) + '、項目ごとの額と構成比）</summary><div class="table-wrap"><table class="kk"><thead><tr><th scope="col">区分</th><th scope="col">項目</th><th scope="col">額<span class="sm">万円</span></th><th scope="col">構成比<span class="sm">％</span></th><th scope="col">原典のページ</th></tr></thead><tbody>' + trs.join('') + '</tbody></table></div></details>' +
+    '<p class="src-note">出典：' + extA(U.ref.url, '「' + esc(U.ref.title) + '」（PDF：' + fsize(U.ref.bytes) + '）') + '。単位は原典の万円のままで、換算していません。項目は原典のまとめ方のままです。太字の項目（' + sides.filter(sd => sd[1] && G[sd[1]]).map(sd => G[sd[1]].map(o => esc(o.name)).join('・')).join('、') + '）は、原典の円グラフの内側の区分です。棒の長さは、項目の額の和に対する割合です。並びは額の多い順です。構成比は原典の値（原典の桁のまま）で、足しても 100 にならないことがあります。' + notes.join('') + '</p>' +
+    '<p class="src-note">' + kkAu(KK.audit['kk-r' + KKY], '決算の内訳', '数字') + '</p>';
+}
+
+/* 健全化判断比率と資金不足比率（選んだ年度の値と基準） */
+function drawKz(){
+  const Z = KK.kenzenka, yy = 'r' + KKY, box = document.getElementById('kkKz');
+  document.getElementById('kkKzH2').textContent = '健全化判断比率と資金不足比率（' + KKL(KKY) + '）';
+  if (!Z.years.includes(yy)) {
+    const last = Z.years[Z.years.length - 1];
+    box.innerHTML = '<p class="kk-none">' + KKL(KKY) + 'の値は、まだこのページに載せていません（財政状況資料集は' + KKL(Number(last.slice(1))) + 'までです）。</p>'; return;
+  }
+  const v = x => x == null ? '' : esc(x);
+  const rows = Z.items.map(o => '<tr><th scope="row">' + esc(o.name) + '</th><td>' + v(o.v[yy]) + '</td><td>' + v(o.soki[yy]) + '</td><td>' + v(o.saisei[yy]) + '</td></tr>').join('');
+  const notes = [];
+  if (Z.items.some(o => [o.v[yy], o.soki[yy], o.saisei[yy]].includes('-'))) notes.push('「-」は原典のセルの字のままです。原典の総括表の注釈（※6）に<q>' + esc(Z.note6) + '</q>とあります。');
+  Z.items.filter(o => o.v[yy] === '').forEach(o => notes.push(esc(o.name) + 'の欄は、原典で空です。原典の総括表の注釈に<q>' + esc(Z.note4) + '</q>とあります。'));
+  Z.items.filter(o => !Object.keys(o.soki).length).forEach(o => notes.push(esc(o.name) + 'の基準は、原典の健全化判断比率の表に無いため、欄を空けています。'));
+  Z.items.forEach(o => ['soki', 'saisei'].forEach(k => { if (o[k][yy] === '') notes.push(esc(o.name) + 'の' + (k === 'soki' ? '早期健全化基準' : '財政再生基準') + 'の欄は、原典で空です。'); }));
+  const d = Z.docs[yy];
+  box.innerHTML = '<div class="table-wrap"><table class="kk"><thead><tr><th scope="col">指標</th><th scope="col">' + KKL(KKY) + '<span class="sm">％</span></th><th scope="col">早期健全化基準<span class="sm">％</span></th><th scope="col">財政再生基準<span class="sm">％</span></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    '<p class="src-note">' + notes.join('') + '</p>' +
+    '<p class="src-note">実質公債費比率と将来負担比率の年度ごとの推移は、<a href="#zaisei">「財政指標と予算の規模」の画面</a>にあります。出典：' + extA(d.url, '「' + esc(d.title) + '」（Excel：' + fsize(d.bytes) + '）') + 'の総括表（比率）と、「各会計、関係団体の財政状況及び健全化判断比率」のシートの健全化判断比率の表（基準）。値は原典の桁のままです。</p>' +
+    '<p class="src-note">' + kkAu(KK.audit['kk-kenzenka-' + yy], '財政指標', '数字') + '</p>';
+}
+
+/* 監査の結果（一覧は新しい順が既定。hino-portal DESIGN.md 6.5） */
+const KS_KIND = [['', 'すべて'], ['teiki', '課の定期監査'], ['dantai', '団体の監査']];
+const KS_NAME = {teiki: '課の定期監査', dantai: '団体の監査'};
+const ksDate = r => (r.kansa_bi.match(/^.*?日(（.）)?/) || [r.kansa_bi])[0];
+const ksTitle = r => '令和' + r.fy + '年度監査等の結果 ' + r.title_rest;
+function ksJiko(r){
+  return '<ul class="kk-jiko">' + r.jiko.map(j => '<li>' + esc(j.jiko) + (j.komoku ? ' ' + esc(j.komoku) : '') + (j.gaku != null ? ' ' + nu(fmt(j.gaku) + '円') : '') + '</li>').join('') + '</ul>';
+}
+function ksRow(r){
+  const pdf = extA(r.url, '「' + esc(ksTitle(r)) + '」（PDF：' + fsize(r.bytes) + '）');
+  if (r.mode !== 'full') {
+    return '<div class="kk-row kk-plain"><b class="kk-tt">' + esc(r.title_rest) + '</b><span class="tag kk">' + (r.mode === 'image' ? '文字を取り出せない PDF' : '照合の前') + '</span><br>' + pdf + '</div>';
+  }
+  const tags = '<span class="tag kk">' + KS_NAME[r.shurui] + '</span>' + (r.shurui === 'dantai' && r.shiteki !== 'なし' ? '<span class="tag kk">指摘事項あり</span>' : '');
+  return '<details class="kk-row"><summary><span class="it-name"><span class="kk-date">' + esc(ksDate(r)) + '</span>' + esc(r.taisho) + tags + '</span>' + ksJiko(r) + '</summary><div class="kk-body">' +
+    '<h4>監査の結果</h4>' + r.kekka.map(t => '<p>' + esc(t) + '</p>').join('') +
+    (r.shurui === 'dantai' ? '<h4>指摘事項</h4><p>' + esc(r.shiteki) + '</p>' : '') +
+    '<dl class="it-dl"><dt>監査の日時</dt><dd>' + esc(r.kansa_bi) + '</dd><dt>監査の対象</dt><dd>' + esc(r.taisho) + (r.taisho_title ? '（原典の対象の欄を読めなかったため、町のホームページの題の字）' : '') + '</dd>' +
+    '<dt>告示</dt><dd>' + esc(r.kokuji) + '（' + esc(r.kohyo_bi) + '）</dd><dt>原典</dt><dd>' + pdf + '</dd></dl></div></details>';
+}
+function drawKs(){
+  const all = KK.kansa.reports.filter(r => r.fy === KKY), N = KK.kansa.n[String(KKY)];
+  document.getElementById('kkKsH2').textContent = '監査の結果（' + KKL(KKY) + '）';
+  document.getElementById('kkKind').innerHTML = KS_KIND.map(([k, l]) => '<button type="button" data-kind="' + k + '" class="' + (k === kkKind ? 'is-on' : '') + '" aria-pressed="' + (k === kkKind) + '">' + l + '（' + (k ? all.filter(r => r.shurui === k).length : all.length) + '件）</button>').join('');
+  const rows = (kkKind ? all.filter(r => r.shurui === kkKind) : all).slice();
+  const dir = kkOrd === 'desc' ? -1 : 1;
+  rows.sort((a, b) => (a.ord == null) - (b.ord == null) || (a.ord != null && b.ord != null && (a.ord - b.ord) * dir) || (a.doc < b.doc ? -dir : dir));
+  const rest = kkAll ? 0 : Math.max(0, rows.length - KS_FIRST);
+  document.getElementById('kkKs').innerHTML = (rows.length ? rows.slice(0, rows.length - rest).map(ksRow).join('') : '<p class="empty">この種類の監査の結果はありません。</p>') +
+    (rest ? '<button type="button" class="kk-more" id="kkMore" aria-controls="kkKs" aria-expanded="false">残りの' + rest + '件を表示</button>' : '');
+  if (rest) document.getElementById('kkMore').onclick = () => { kkAll = true; drawKs(); const el = document.querySelectorAll('#kkKs .kk-row')[KS_FIRST]; if (el) (el.querySelector('summary') || el.querySelector('a')).focus(); };
+  const lead = [];
+  if (N.image) lead.push('「文字を取り出せない PDF」の' + nu(N.image + '件') + 'は、文字を取り出せない形の PDF のため、内容は PDF で確かめてください。');
+  if (N.pending) lead.push('「照合の前」の' + nu(N.pending + '件') + 'は、取り出した文字と原典との照合がまだ済んでいないため、題と PDF へのリンクだけを載せています。');
+  if (N.image || N.pending) lead.push('この' + nu((N.image + N.pending) + '件') + 'は監査の種類を確かめていないため、種類で絞り込むときは表示しません。題の月で並べ、題に月の無い件は最後に置いています。');
+  document.getElementById('kkKsLead').innerHTML = lead.join('');
+  document.getElementById('kkKsNote').innerHTML = (all.some(r => r.taisho_title) ? '対象の欄を読めなかった件は、町のホームページの題の字を対象として載せています。' : '') +
+    '課の定期監査は監査委員による各課の定期監査、団体の監査は町が補助金や指定管理料を出している団体の監査（財政援助団体等の監査）です。並びは監査の日の順です。監査の結果の文は、原典の PDF から取り出した文字の行の折り返しをつないだもので、字は直していません。段落は、行が「。」で終わるところで分けたもので、原典の段落と違うことがあります。団体の監査の額は、原典の円の額です。' +
+    (N.full ? '<br>' + kkAu(KK.audit['kk-kansa-r' + KKY], '監査の結果', '値と文') : '');
+}
+document.getElementById('kkKind').addEventListener('click', e => { const b = e.target.closest('[data-kind]'); if (b) { kkKind = b.dataset.kind; kkAll = false; drawKs(); } });
+document.querySelectorAll('[data-ord]').forEach(b => b.addEventListener('click', () => {
+  kkOrd = b.dataset.ord; kkAll = false;
+  document.querySelectorAll('[data-ord]').forEach(x => { const on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on); });
+  drawKs();
+}));
+function drawKk(){
+  kkYearsBox.querySelectorAll('[data-kk]').forEach(b => { const on = Number(b.dataset.kk) === KKY; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); });
+  kkAll = false;
+  drawUw(); drawKz(); drawKs();
+  /* 決算の概要と財政状況資料集の無い年度は、2つの節を閉じ、そのことを年度のボタンの下に1文で書く */
+  const noUw = !KK.uchiwake[String(KKY)], noKz = !KK.kenzenka.years.includes('r' + KKY), miss = document.getElementById('kkMiss');
+  document.getElementById('kk-uchiwake').hidden = noUw;
+  document.getElementById('kk-kenzenka').hidden = noKz;
+  const ms = [];
+  if (noUw) ms.push('決算の内訳');
+  if (noKz) ms.push('健全化判断比率');
+  miss.hidden = !ms.length; miss.textContent = KKL(KKY) + 'の' + ms.join('と') + 'は、まだ載せていません。';
+}
+drawKk();
 
 selectYear();
 drawTrend();

@@ -17,6 +17,10 @@
                     data/struct/zaisei-shihyo.tsv・zaisei-ichi.tsv  財政指標と値の位置（§13.8）
                     data/struct/audit/hosei-r<n>.tsv・kessan.tsv・zaisei.tsv  構造化の層の検収の台帳（§13.10）
                     data/struct/issues/yosan-r5-hosei-02.tsv など4つ  補正予算の原典の誤りの記録（§13.11。HOSEI_ISSUES）
+                    data/struct/kessan-uchiwake.tsv・issues/kessan-r3-gaiyou.tsv  決算の内訳（§13.7）と原典の誤りの記録
+                    data/struct/kansa-kekka.tsv・kansa-jiko.tsv・audit/kansa.tsv  監査の結果の報告・事項と検収の台帳（§13.15）
+                    data/text/kansa-*.txt                 監査の結果の文字の層（結果の文。台帳の check が ok の80本）
+                    data/text/zaisei-r<n>-shiryoshu/01.tsv  財政状況資料集の総括表の文字（注釈 ※4・※6 の字を確かめる。令和3〜6年度）
 このリポジトリ   data/totals-r<n>.json                 当初予算の会計ごとの予算規模（原典から転記した正本）
 
 材料は、このリポジトリと同じフォルダにある各リポジトリ（例 ../shiga-hino-plans）から読む。
@@ -59,6 +63,12 @@
         data/totals-r<n>.json の一般会計・特別会計・企業会計の額と同じ。表の無い区分は、その区分の回も無いこと
      f. 決算（その年度の決算審査意見書の行がある年度だけ。ある年度は出す会計のすべてにそろう）: 決算審査意見書の円の額で、歳入総額−歳出総額＝歳入歳出差引額（介護保険特別会計は勘定ごと）
      g. 財政指標: 載せる9指標が10年そろう（抜けた年度は表示して止める）。財政比較分析表の当該団体の値＝総括表の値
+  8. 決算と監査（令和3〜7年度。DESIGN.md ADR-8）
+     a. 決算の内訳: 使う行がすべて検収済み。出典が kessan-r<n>-gaiyou だけで、単位が万円。外側の輪の和＝内側の輪の和（歳入・性質別の歳出）
+     b. 健全化判断比率: 使う値がすべて検収済み。各年度の総括表に注釈 ※4・※6 の字がある
+     c. 監査の結果: 台帳の kansa の行（check が ok か image）ごとに1件。ok の行は報告の表にあり、報告と事項の行が台帳に同じ値であること。
+        検収済みでない行のある報告は、題と PDF だけにする（値を使わない）。結果の文は data/text の kekka_from〜kekka_to の行で、
+        つないだ字が文字の層の字と同じ。団体の監査は「イ．指摘事項」の後ろの字が shiteki と同じ
 どれかが合わなければ data.js を書かずに終了コード 1 で止まる。
 """
 import argparse, hashlib, json, pathlib, re, sys, unicodedata
@@ -494,7 +504,8 @@ HOSEI_AUDIT = [f'audit/hosei-r{y}.tsv' for y in KOZO_YEARS]
 KZ = {n: TD + n for n in (
     'hosei-kai.tsv', 'hosei-shiryo.tsv', 'hosei-kan.tsv', 'hosei-kaikei.tsv', 'hosei-maru.tsv', 'kessan-kai.tsv',
     'kessan-gaku.tsv', 'zaisei-shihyo.tsv', 'zaisei-ichi.tsv', *HOSEI_AUDIT, 'audit/kessan.tsv', 'audit/zaisei.tsv',
-    *HOSEI_ISSUES)}
+    *HOSEI_ISSUES, 'kessan-uchiwake.tsv', 'issues/kessan-r3-gaiyou.tsv', 'kansa-kekka.tsv', 'kansa-jiko.tsv',
+    'audit/kansa.tsv')}
 for tag in KZ.values():
     if tag not in files:
         errors.append(f'lock: {tag} が inputs.lock.json に載っていない')
@@ -544,7 +555,7 @@ def row_key(*a):  # DOCS_SCHEMA §13.10（hino-town-docs tools/kozo.py の row_k
 
 
 LEDGER = {}
-for n in (*HOSEI_AUDIT, 'audit/kessan.tsv', 'audit/zaisei.tsv'):
+for n in (*HOSEI_AUDIT, 'audit/kessan.tsv', 'audit/zaisei.tsv', 'audit/kansa.tsv'):
     for r in K[n]:
         LEDGER[r['key']] = (n, r)
 kz_used = {}   # (台帳, 区切り) → {'n','a'(auto:pdftext),'k'(auto:check),'b'(auto:ai),'c'(人)}。区切りは年度（r6 など）か zaisei
@@ -942,8 +953,262 @@ zdocs = {}
 for yy in ZY:
     d = f'zaisei-{yy}-shiryoshu'
     zdocs[yy] = doc_ref(d, 0)
+
+# 8. 決算と監査（DESIGN.md ADR-8）。年度は令和3〜7年度。3つの節（決算の内訳・健全化判断比率・監査の結果）を年度でそろえる -----
+KK_YEARS = [3, 4, 5, 6, 7]
+TXT = 'hino-town-docs/data/text/'
+
+
+def ledger_state(table, row, cols, vals, unit, bucket):
+    """監査の結果の行を検収の台帳で引く。出典（source）は表に無いので台帳の行から取り、照合キーを作り直して確かめる。
+    'ok'（検収済み）か 'pending'（要人確認が残る・✓ でない）を返す。台帳に無い・値が違うときは誤り。"""
+    hit = [r for n, r in LEDGER.values() if r['table'] == table and r['row'] == row]
+    if len(hit) != 1:
+        errors.append(f'検収の台帳: {table} {row} の行が {len(hit)}行')
+        return None
+    r = hit[0]
+    if r['cols'] != ','.join(cols) or r['value'] != '|'.join(vals) or r['unit'] != unit:
+        errors.append(f'検収の台帳: {table} {row} の値が台帳と違う（台帳 {r["value"][:40]!r}）')
+        return None
+    if row_key(table, row, r['cols'], r['value'], r['unit'], r['source']) != r['key']:
+        errors.append(f'検収の台帳: {table} {row} の照合キーが作り直したものと違う')
+        return None
+    if r['checked'] != '✓' or r['note'].startswith('要人確認'):
+        return 'pending'
+    s = kz_used.setdefault(('audit/kansa.tsv', bucket), {'n': 0, 'a': 0, 'k': 0, 'b': 0, 'c': 0})
+    s['n'] += 1
+    s[{'auto:pdftext': 'a', 'auto:check': 'k', 'auto:ai': 'b'}.get(r['reviewer'], 'c')] += 1
+    return 'ok'
+
+
+# 8a. 決算の内訳（一般会計。決算の概要の円グラフの項目。単位は原典の万円のまま）
+UW_GROUPS = ['sainyu', 'sainyu-naka', 'seishitsu', 'seishitsu-naka', 'mokuteki']
+uw_issue = {}
+for r in K['issues/kessan-r3-gaiyou.tsv']:
+    if r['status'] == '原典のまま持つ':
+        for w in re.findall(r'r[0-9]+-ippan/u[0-9]{3}', r['where']):
+            uw_issue[w] = {'issue': r['issue'], 'file': 'data/struct/issues/kessan-r3-gaiyou.tsv', 'no': r['no']}
+uchiwake = {}
+for y in KK_YEARS:
+    KZ_BUCKET = f'kk-r{y}'
+    rs = [r for r in K['kessan-uchiwake.tsv'] if r['kai'] == f'r{y}-ippan']
+    if not rs:
+        continue          # 決算の概要の無い年度（令和7年度）。図を出さず、無いことを画面に書く
+    doc = {r['doc'] for r in rs}
+    if doc != {f'kessan-r{y}-gaiyou'}:
+        errors.append(f'決算の内訳 r{y}: 出典が kessan-r{y}-gaiyou だけでない（{sorted(doc)}）')
+    g = {}
+    for r in rs:
+        if r['unit'] != '万円' or r['group'] not in UW_GROUPS:
+            errors.append(f"決算の内訳: {r['kai']}/{r['key']} の unit か group が違う（{r['unit']}・{r['group']}）")
+            continue
+        if not re.fullmatch(r'[0-9]+', r['value']) or (r['ratio'] and not re.fullmatch(r'[0-9]+(\.[0-9]+)?', r['ratio'])):
+            errors.append(f"決算の内訳: {r['kai']}/{r['key']} の value か ratio の形が違う")
+            continue
+        audited('kessan-uchiwake', f"{r['kai']}/{r['key']}", ['name', 'value'], [r['name'], r['value']], r['unit'],
+                f"{r['doc']} p.{r['page']}")
+        o = {'key': r['key'], 'name': r['name'], 'value': int(r['value']), 'ratio': r['ratio'], 'page': int(r['page'])}
+        iss = uw_issue.get(f"{r['kai']}/{r['key']}")
+        if iss:
+            o['raw'] = r['raw']
+            o['issue'] = iss
+        g.setdefault(r['group'], []).append(o)
+    # 検算：外側の輪の和＝内側の輪の和（歳入、性質別の歳出）。目的別の歳出しかない年度は内側の輪が無い
+    sides = []
+    for outer, inner in (('sainyu', 'sainyu-naka'), ('seishitsu', 'seishitsu-naka'), ('mokuteki', None)):
+        if outer not in g:
+            continue
+        so = sum(o['value'] for o in g[outer])
+        if inner:
+            if inner not in g:
+                errors.append(f'決算の内訳 r{y}: {outer} はあるが {inner} が無い')
+            elif sum(o['value'] for o in g[inner]) != so:
+                errors.append(f'決算の内訳 r{y}: {outer} の和 {so:,} ≠ {inner} の和 {sum(o["value"] for o in g[inner]):,}')
+        sides.append(outer)
+    if 'sainyu' not in g or not ({'seishitsu', 'mokuteki'} & set(g)):
+        errors.append(f'決算の内訳 r{y}: 歳入か歳出の内訳が無い')
+    uchiwake[str(y)] = {'groups': g, 'ref': {**doc_ref(f'kessan-r{y}-gaiyou', 0), 'bytes': int(town_kz[f'kessan-r{y}-gaiyou']['bytes'])}}
+
+# 8b. 健全化判断比率と資金不足比率（総括表の値と、シート03 の基準。選んだ年度の値だけ）
+KZ_KEYS = [('jisshitsu-akaji', True), ('renketsu-akaji', True), ('jisshitsu-kosaihi', True), ('shorai-futan', True),
+           ('shikin-fusoku', False)]
+# 総括表の注釈の字（各年度の資料の総括表にあることを確かめて載せる）
+KZ_NOTE4 = '※4：資金不足比率欄には、資金が不足している会計のみ記載している。'
+KZ_NOTE6 = '（その他、数値のない欄については、すべてハイフン（－）としている）'
+kz_years = [f'r{y}' for y in KK_YEARS if f'r{y}' in ZY]
+
+
+def zcell(key, yy):
+    r = ZS.get(key)
+    i = ichi.get((key, yy))
+    if r is None or i is None or yy not in r:
+        errors.append(f'健全化判断比率: {key}/{yy} が無いか値の位置が無い')
+        return ''
+    audited('zaisei-shihyo', f'{key}/{yy}', [yy], [r[yy]], r['unit'], f"{i['doc']} {i['sheet']}!{i['cell']}")
+    if r['unit'] != '％':
+        errors.append(f'健全化判断比率: {key} の unit が ％ でない')
+    if r[yy] not in ('', '-') and not re.fullmatch(r'[0-9]+(\.[0-9]+)?', r[yy]):
+        errors.append(f'健全化判断比率: {key}/{yy} の値の形が違う（{r[yy]!r}）')
+    return r[yy]
+
+
+kz_items = []
+for key, has_kijun in KZ_KEYS:
+    o = {'key': key, 'name': ZS[key]['name'].strip().replace('　', '').replace(' (※4)', ''), 'v': {}, 'soki': {}, 'saisei': {}}
+    for yy in kz_years:
+        KZ_BUCKET = f'kk-kenzenka-{yy}'
+        o['v'][yy] = zcell(key, yy)
+        if has_kijun:
+            o['soki'][yy] = zcell(f'soki-{key}', yy)
+            o['saisei'][yy] = zcell(f'saisei-{key}', yy)
+    kz_items.append(o)
+for yy in kz_years:
+    t = files.get(f'{TXT}zaisei-{yy}-shiryoshu/01.tsv')
+    if t is None:
+        errors.append(f'lock: {TXT}zaisei-{yy}-shiryoshu/01.tsv が inputs.lock.json に載っていない')
+    elif KZ_NOTE4 not in t or KZ_NOTE6 not in t:
+        errors.append(f'健全化判断比率: zaisei-{yy}-shiryoshu の総括表に注釈 ※4・※6 の字が無い')
+kenzenka = {'years': kz_years, 'items': kz_items,
+            'docs': {yy: {**zdocs[yy], 'bytes': int(town_kz[f'zaisei-{yy}-shiryoshu']['bytes'])} for yy in kz_years},
+            'note4': KZ_NOTE4, 'note6': KZ_NOTE6.strip('（）')}
+
+# 8c. 監査の結果（DOCS_SCHEMA §13.15）。報告の表・事項の表・検収の台帳・台帳の title と url・文字の層の結果の文
+SHURUI = {'teiki': '課の定期監査', 'dantai': '団体の監査'}
+ZEN = str.maketrans('０１２３４５６７８９', '0123456789')
+KEKKA_HEAD = re.compile(r'^\s*[６6][．.]\s*監\s*査\s*の\s*結\s*果\s*')
+SHITEKI_HEAD = re.compile(r'^イ[．.]\s*指摘事項$')
+kekka_by = {r['doc']: r for r in K['kansa-kekka.tsv']}
+jiko_by = {}
+for r in K['kansa-jiko.tsv']:
+    jiko_by.setdefault(r['doc'], []).append(r)
+
+
+def ksort(y, title, kansa_bi=''):
+    """並べるための日付の数（YYYYMMDD）。監査の日の字から読み、無ければ台帳の題の月（日は 0）。読めなければ None。"""
+    m = re.match(r'令和([0-9]+)年([0-9]+)月([0-9]+)日', kansa_bi.translate(ZEN))
+    if m:
+        return (2018 + int(m.group(1))) * 10000 + int(m.group(2)) * 100 + int(m.group(3))
+    m = re.match(r'([0-9]+)月', title.split(' ', 1)[1] if ' ' in title else '')
+    if m:
+        mo = int(m.group(1))
+        return (2018 + y + (1 if mo <= 3 else 0)) * 10000 + mo * 100
+    return None
+
+
+def paragraphs(lines):
+    """文字の層の行の折り返しをつなぐ。行の前後の空白を除き、つなぎ目に空白を入れない（字は直さない）。
+    行が「。」で終わるところと、「ア．」「イ．」などの見出しの行の前後で段落を分ける。"""
+    out, cur = [], ''
+    for raw in lines:
+        s = raw.replace('\f', '').strip()
+        if not s:
+            continue
+        mk = re.match(r'^[アイウエ][．.]', s)
+        if mk and cur:
+            out.append(cur)
+            cur = ''
+        cur += s
+        if s.endswith('。') or mk:
+            out.append(cur)
+            cur = ''
+    if cur:
+        out.append(cur)
+    return out
+
+
+nows = lambda s: re.sub(r'\s', '', s)
+kansa = []
+kansa_n = {}
+for y in KK_YEARS:
+    srows = [r for r in trows if r['category'] == 'kansa' and r['fiscal_year'] == str(2018 + y)]
+    KZ_BUCKET = f'kk-kansa-r{y}'
+    cnt = {'n': len(srows), 'full': 0, 'image': 0, 'pending': 0, 'teiki': 0, 'dantai': 0}
+    for s in sorted(srows, key=lambda r: r['id']):
+        if not re.fullmatch(rf'kansa-r{y}-[0-9]{{2}}', s['id']) or not s['url'].startswith('https://') or s['format'] != 'pdf':
+            errors.append(f"監査の結果: 台帳の {s['id']} の id・url・format の形が違う")
+            continue
+        head, _, rest = s['title'].partition(' ')
+        if head != f'令和{y}年度監査等の結果' or not rest:
+            errors.append(f"監査の結果: 台帳の {s['id']} の題が「令和{y}年度監査等の結果 <月と対象>」の形でない（{s['title']}）")
+        o = {'doc': s['id'], 'fy': y, 'title_rest': rest, 'url': s['url'], 'bytes': int(s['bytes'])}
+        k = kekka_by.get(s['id'])
+        if s['check'] == 'image':
+            if k is not None:
+                errors.append(f"監査の結果: {s['id']} は台帳の check が image なのに報告の表に行がある")
+            o['mode'] = 'image'
+        elif s['check'] == 'ok':
+            if k is None:
+                errors.append(f"監査の結果: {s['id']} は台帳の check が ok なのに報告の表に行が無い")
+                continue
+            if k['shurui'] not in SHURUI:
+                errors.append(f"監査の結果: {s['id']} の shurui が決まった語彙にない（{k['shurui']!r}）")
+                continue
+            cols = ['shurui', 'kokuji', 'kohyo_bi', 'kansa_bi', 'taisho', 'shiteki', 'kekka_from', 'kekka_to']
+            st = [ledger_state('kansa-kekka', s['id'], cols, [k[c] for c in cols], '', KZ_BUCKET)]
+            js = sorted(jiko_by.get(s['id'], []), key=lambda r: int(r['n']))
+            if [int(r['n']) for r in js] != list(range(1, len(js) + 1)) or not js:
+                errors.append(f"監査の結果: {s['id']} の事項の n が1からの連番でない")
+            for r in js:
+                st.append(ledger_state('kansa-jiko', f"{s['id']}/{r['n']}", ['jiko', 'komoku', 'gaku', 'gaku_raw'],
+                                       [r['jiko'], r['komoku'], r['gaku'], r['gaku_raw']], '円' if r['gaku'] else '', KZ_BUCKET))
+            if None in st:
+                continue
+            if 'pending' in st:
+                # 照合の済んでいない値は使わない。題と PDF だけの行にする
+                o['mode'] = 'pending'
+            else:
+                o['mode'] = 'full'
+                o.update({'shurui': k['shurui'], 'kokuji': k['kokuji'], 'kohyo_bi': k['kohyo_bi'], 'kansa_bi': k['kansa_bi'],
+                          'taisho': k['taisho'] or rest})
+                if not k['taisho']:
+                    o['taisho_title'] = True     # 対象を読めなかった本は、台帳の題の字を対象として出す
+                o['jiko'] = [{'jiko': r['jiko'], 'komoku': r['komoku'], 'gaku': int(r['gaku']) if r['gaku'] else None} for r in js]
+                for j, r in zip(o['jiko'], js):
+                    if (k['shurui'] == 'dantai') != (j['gaku'] is not None):
+                        errors.append(f"監査の結果: {s['id']}/{r['n']} の額の有無が報告の種類と合わない")
+                # 結果の文（data/text の kekka_from〜kekka_to の行）
+                t = files.get(f"{TXT}{s['id']}.txt")
+                if t is None:
+                    errors.append(f"lock: {TXT}{s['id']}.txt が inputs.lock.json に載っていない")
+                    continue
+                L = t.split('\n')
+                a, b = int(k['kekka_from']), int(k['kekka_to'])
+                if not (1 <= a <= b <= len(L)):
+                    errors.append(f"監査の結果: {s['id']} の kekka_from・kekka_to が文字の層の行の範囲に無い")
+                    continue
+                seg = L[a - 1:b]
+                if KEKKA_HEAD.match(seg[0].replace('\f', '')):
+                    seg[0] = KEKKA_HEAD.sub('', seg[0].replace('\f', ''))   # 見出しと本文の始まりが同じ行の本は、見出しの字を除く
+                    o['head_cut'] = True
+                if k['shurui'] == 'dantai':
+                    # 団体の監査は「イ．指摘事項」の行で分け、後ろは報告の表の shiteki と同じ字であることを確かめて、指摘事項として出す
+                    hs = [i for i, l in enumerate(seg) if SHITEKI_HEAD.match(l.replace('\f', '').strip())]
+                    if len(hs) != 1 or nows(''.join(seg[hs[0] + 1:]).replace('\f', '')) != nows(k['shiteki']):
+                        errors.append(f"監査の結果: {s['id']} の結果の文の「イ．指摘事項」の後ろが shiteki と同じでない")
+                        continue
+                    seg = seg[:hs[0]]
+                    o['shiteki'] = k['shiteki']
+                o['kekka'] = paragraphs(seg)
+                if not o['kekka'] or nows(''.join(o['kekka'])) != nows(''.join(seg).replace('\f', '')):
+                    errors.append(f"監査の結果: {s['id']} の結果の文をつないだ字が文字の層の字と違う")
+                cnt[k['shurui']] += 1
+        else:
+            errors.append(f"監査の結果: 台帳の {s['id']} の check が ok でも image でもない（{s['check']!r}）")
+            continue
+        cnt[o['mode']] += 1
+        o['ord'] = ksort(y, s['title'], o.get('kansa_bi', ''))
+        kansa.append(o)
+    kansa_n[str(y)] = cnt
+miss = set(kekka_by) - {o['doc'] for o in kansa}
+if miss:
+    errors.append(f'監査の結果: 報告の表にあって、画面の年度の台帳の行に無い本: {sorted(miss)}')
+kk = {
+    'years': KK_YEARS, 'uchiwake': uchiwake, 'kenzenka': kenzenka,
+    'kansa': {'reports': kansa, 'n': kansa_n},
+}
 if errors:
     fail_now()
+kk['audit'] = {b: {'file': 'data/struct/' + n, **s} for (n, b), s in sorted(kz_used.items()) if b.startswith('kk-')}
 for yo in kozo_years:   # 年度ごとの、使った行の検収（補正予算の台帳と決算の台帳）
     b = f"r{yo['fy']}"
     yo['audit'] = {('hosei' if n.startswith('audit/hosei-') else 'kessan'): {'file': 'data/struct/' + n, **s}
@@ -984,6 +1249,7 @@ meta = {
     'plan': {'id': PLAN_ID, 'name': jisshi['meta']['name'], 'fy': LINK_YEAR},
     'chains': {'n': len(chains), 'name': ny['name'], 'manual': ny['manual']},
     'kozo': kozo,
+    'kk': kk,
 }
 meta['inputs'] = [{'repo': r, 'commit': c} for r, c in meta['inputs']]
 js = ['/* tools/build_data.py で生成。直接編集しない。材料と版は inputs.lock.json にある。 */',
@@ -1027,4 +1293,11 @@ for x in kz_report:
 print('  財政指標: ' + '・'.join(o['name'] for o in shihyo) + f'（{len(shihyo)}指標×{len(ZY)}年度、抜け 0）')
 print('  使った行の検収（台帳ごと。行数／プログラムの照合・機械の検算・AI・人）: ' + '、'.join(
     f"{n}（{b}） {s['n']}行／{s['a']}・{s['k']}・{s['b']}・{s['c']}" for (n, b), s in sorted(kz_used.items())))
+print('決算と監査（令和3〜7年度）:')
+print('  決算の内訳（一般会計）: ' + '、'.join(f"令和{y}年度 " + ('・'.join(f"{g} {len(v)}項目 {fmt(sum(o['value'] for o in v))}万円" for g, v in kk['uchiwake'][str(y)]['groups'].items()) if str(y) in kk['uchiwake'] else 'なし') for y in KK_YEARS))
+print('  健全化判断比率: ' + '、'.join(f"{o['name']} " + '・'.join(f"{yy} {o['v'][yy] or '空'}" for yy in kz_years) for o in kz_items))
+for y in KK_YEARS:
+    c = kansa_n[str(y)]
+    print(f"  監査の結果 令和{y}年度: 台帳 {c['n']}本 ＝ 内容を出す {c['full']}本（課の定期監査 {c['teiki']}・団体の監査 {c['dantai']}）＋ 照合が済んでいないため題と PDF だけ {c['pending']}本 ＋ 画像の PDF {c['image']}本")
+print('  使った行の検収: ' + '、'.join(f"{b} {s['n']}行／{s['a']}・{s['k']}・{s['b']}・{s['c']}" for b, s in kk['audit'].items()))
 print('検算 OK。data.js を書き出しました。')
