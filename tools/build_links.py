@@ -3,7 +3,7 @@
 
 作る表（data/links/）:
   kessan-nagare.tsv   決算の年度ごとの、議会での流れ（年度 × 段階。採決は採決ごとに1行）
-  iken-hatsugen.tsv   決算審査の意見を引いた発言（発言 × 意見）
+  iken-yaritori.tsv   決算審査の意見書を踏まえた質疑のやりとり（やりとり1つ × 意見書の箇所1つ）
   inputs.json         読んだ材料の、リポジトリ・commit・パス・sha256
 
 材料（読むだけ）:
@@ -23,7 +23,7 @@ import argparse, hashlib, json, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LINKS = ROOT / 'data' / 'links'
 NAGARE = LINKS / 'kessan-nagare.tsv'
-HATSUGEN = LINKS / 'iken-hatsugen.tsv'
+YARITORI = LINKS / 'iken-yaritori.tsv'
 INPUTS = LINKS / 'inputs.json'
 
 # 決算の年度（令和）→ 翌年度の9月定例会・12月定例会の会議の ID。
@@ -38,15 +38,21 @@ DANKAI = ['teian', 'setsumei', 'kansa', 'shitsugi', 'futaku', 'hokoku', 'toron',
 DANKAI_JI = {'teian': '提案の説明', 'setsumei': '決算の説明', 'kansa': '監査委員の審査報告', 'shitsugi': '質疑',
              'futaku': '委員会への付託', 'hokoku': '委員長報告', 'toron': '討論', 'saiketsu': '採決'}
 HIKIKATA = ['bango', 'page', 'go']
+DANKAI_YARITORI = ('shitsugi', 'hokoku', 'toron')
 STATUS = ['candidate', 'confirmed', 'rejected']
 
 NAGARE_COLS = ['nendo', 'doc', 'dankai', 'n', 'meeting', 'date', 'sid_from', 'sid_to', 'gian', 'kekka', 'hoho',
                'status', 'reviewer', 'date_kakunin', 'note']
 NAGARE_KEY = ('nendo', 'dankai', 'n')
 NAGARE_TOOL = ['doc', 'meeting', 'date', 'sid_from', 'sid_to', 'gian', 'kekka', 'hoho']
-HATSUGEN_COLS = ['nendo', 'sid', 'role', 'hikikata', 'konkyo', 'iken', 'status', 'reviewer', 'date_kakunin', 'note']
-HATSUGEN_KEY = ('sid', 'hikikata', 'konkyo')
-HATSUGEN_TOOL = ['nendo', 'role', 'iken']
+YARITORI_COLS = ['nendo', 'doc', 'sid_q', 'sid_a', 'role_q', 'role_a', 'hikikata', 'kyoshutsu', 'konkyo',
+                 'insatsu_page', 'iken', 'basho', 'status', 'reviewer', 'date_kakunin', 'note']
+YARITORI_KEY = ('sid_q', 'kyoshutsu', 'hikikata', 'konkyo')
+YARITORI_TOOL = ['nendo', 'doc', 'sid_a', 'role_q', 'role_a', 'insatsu_page', 'iken', 'basho']
+BASHO = ['iken', 'hyo', 'fumei']
+KYOSHUTSU = ['q', 'a']
+MIDASHI_MAX = 20
+GIIN = re.compile(r'[0-9０-９]+番')
 
 CHAIR = {'議長', '副議長', '臨時議長', '新議長', '新副議長'}
 KONKYO_MAX = 15
@@ -153,6 +159,10 @@ class Iken:
                 if re.fullmatch(r'[0-9]{1,3}', l):
                     num = l
             ins.append(int(num) if num else None)
+        self.ins = getattr(self, 'ins', {})
+        self.ins[doc] = ins
+        self.pages_text = getattr(self, 'pages_text', {})
+        self.pages_text[doc] = pages
         lines = text.split('\n')
         starts, off = [], 0
         for l in lines:
@@ -182,6 +192,43 @@ class Iken:
             if (r['doc'] == f'kessan-r{nendo}-ikensho' and r['kaikei'] == 'ippan' and r['bubun'] == 'matome'
                     and r['bango'] == maru):
                 return r['key']
+        return ''
+
+    def midashi(self, nendo, page):
+        """印刷のページ page が意見書のどの章・節にあるかを、data/text の見出しの行の字で返す（読めなければ空）。
+
+        見出しの行は、行の字（前後の空白を除く）が「<数字>．」か「（<数字>）」で始まり、その後ろが数字でなく、
+        「令和」を含まない行。章は、そのうち「会計」で終わる行。印刷のページ番号が page の PDF のページ（1つに
+        決まるとき）について、そのページの最後までで最後の章の見出しと、その章の見出しより後でそのページの
+        始まりまでで最後の見出し（無ければ空）と、そのページの中の見出しを、原典の字のまま「／」でつなぐ。
+        20字を超えれば章を除き、それでも超えれば空にする。
+        """
+        doc = f'kessan-r{nendo}-ikensho'
+        ps = [i for i, x in enumerate(self.ins[doc]) if x == page]
+        if len(ps) != 1:
+            return ''
+        P = ps[0]
+        head = re.compile(r'^(?:[0-9０-９]+[．.]\s*[^0-9０-９.．\s]|[（(][0-9０-９]+[）)]\S)')
+        def hs(pg):
+            return [l.strip() for l in pg.split('\n') if head.match(l.strip()) and '令和' not in l]
+        chap, sec = '', ''
+        for pg in self.pages_text[doc][:P]:
+            for h in hs(pg):
+                if h.endswith('会計'):
+                    chap, sec = h, ''
+                else:
+                    sec = h
+        on = []
+        for h in hs(self.pages_text[doc][P]):
+            if h.endswith('会計'):
+                chap, sec, on = h, '', []
+            else:
+                on.append(h)
+        secs = ([sec] if sec else []) + on
+        for parts in ([chap] + secs, secs):
+            x = '／'.join(p for p in parts if p)
+            if x and len(x) <= MIDASHI_MAX:
+                return x
         return ''
 
     def on_page(self, nendo, page):
@@ -455,7 +502,7 @@ def build_nagare(c, log):
     return rows
 
 
-# ---------------------------------------------------------------- 意見を引いた発言
+# ---------------------------------------------------------------- 意見書を踏まえた質疑のやりとり
 
 def konkyo_cut(t, a, b):
     s = t[a:b]
@@ -556,80 +603,29 @@ def ledger_parts(c, mid, sid):
     return out
 
 
-def answers_to(c, mid, sid, bills):
-    """決算の議案の部分の質疑の発言に続く答弁（台帳の answers のうち、その質疑の後、次の質疑の前）。"""
+def yaritori_of(c, mid, a, b):
+    """質疑の範囲を、議員の発言（質問）と、その直後に続く答弁者の発言（次の議員の発言の前まで。議長の発言を除く）
+    の組に分ける。"""
     out = []
-    for s, p, rel, kind in ledger_parts(c, mid, sid):
-        if kind != 'q' or p['bill'] not in bills:
+    for s in c.by_meeting[mid]:
+        if not (a <= s['sid'] <= b) or s['role'] in CHAIR:
             continue
-        nxt = min([tr[0] for tr in p['turns'] if tr[0] > rel], default=10 ** 6)
-        base = c.pos[mid][s['from']]
-        for a in p.get('answers', []):
-            if rel < a < nxt:
-                out.append((c.by_meeting[mid][base + a]['sid'], p['bill']))
+        if GIIN.fullmatch(s['role']):
+            out.append([s, []])
+        elif out:
+            out[-1][1].append(s)
     return out
 
 
-def build_hatsugen(c, ik, nagare, log):
-    rows = []
-    stats = {'kw_chair': 0}
-    for nendo, (sep, dec) in NENDO.items():
-        allb = set(kessan_bills(c, nendo))
-        ranges = [(r['dankai'], r['meeting'], r['sid_from'], r['sid_to']) for r in nagare
-                  if r['nendo'] == str(2018 + nendo) and r['dankai'] in ('shitsugi', 'hokoku', 'toron')]
-        cand = []
-        for dk, mid, a, b in ranges:
-            for s in c.by_meeting[mid]:
-                if a <= s['sid'] <= b and KW.search(s['text'].replace('\n', '')):
-                    if s['role'] in CHAIR:
-                        stats['kw_chair'] += 1
-                        continue
-                    cand.append((dk, mid, s['sid']))
-        # 答弁：決算の議案の部分の、候補の質疑の発言に続く答弁
-        ans = {}
-        for dk, mid, sid in cand:
-            if dk == 'shitsugi' and re.fullmatch(r'[0-9０-９]+番', c.speech[sid]['role']):
-                for asid, bill in answers_to(c, mid, sid, allb):
-                    ans.setdefault(asid, []).append((sid, bill, mid))
-        qrows = {}
-        for dk, mid, sid in cand:
-            qrows[sid] = speech_rows(c, ik, nendo, dk, mid, sid, allb, ans.get(sid, []))
-        for asid, qs in sorted(ans.items()):
-            if asid in qrows:
-                continue
-            mid = qs[0][2]
-            qrows[asid] = speech_rows(c, ik, nendo, 'shitsugi', mid, asid, allb, qs)
-        for sid, out in qrows.items():
-            for o in out:
-                for qsid, bill, _ in ans.get(sid, []):
-                    qk = '・'.join(sorted({x['iken'] for x in qrows.get(qsid, []) if x['iken']})) or 'なし'
-                    o['notes'].append(f'直前の質疑（{qsid}。{bill}）への答弁。質疑の行の iken：{qk}')
-                    if not o['konkyo'] and all(any(n.startswith('迷う') for n in x['notes']) for x in qrows.get(qsid, [])):
-                        o['notes'].append('迷う：質疑の行がどれも迷う行')
-                rows.append(mkrow(nendo, sid, c.speech[sid]['role'], o))
-    for r in rows:
-        r['note'] = '。'.join(dict.fromkeys(r.pop('_notes')))
-    rows.sort(key=lambda r: (r['nendo'], r['sid'], r.pop('_pos'), r['hikikata'], r['konkyo']))
-    log.update(stats)
-    return rows
+def is_hito_only(t, anchors):
+    return bool(anchors) and all(g.startswith('監査委員') and (HITO.match(t, a) or HITO.search(t[max(0, a - 6):e + 8]))
+                                 for a, e, g in anchors)
 
 
-def speech_rows(c, ik, nendo, dk, mid, sid, allb, qs):
-    """1つの発言から、意見を引いた行（hikikata・konkyo・iken・notes・pos）を作る。qs は答える相手の質疑。"""
-    t = c.text(sid)
-    anchors, refs = find_refs(t)
-    ctx = ''.join(c.text(q) for q, _, _ in qs)
-    dbt = doubts(t, anchors, ctx)
-    base_note = []
-    if dk == 'shitsugi':
-        lp = ledger_parts(c, mid, sid)
-        lb = sorted({p['bill'] for _, p, _, _ in lp})
-        if lp and not (set(lb) & allb):
-            base_note.append('質疑の台帳で決算の議案でない部分（' + '・'.join(lb) + '）の発言')
-        elif not lp:
-            base_note.append('質疑の台帳の部分に無い発言')
+def place_rows(c, ik, nendo, who, sid, t, refs, dbt):
+    """1つの発言の番号とページを、意見書の箇所の行（hikikata・kyoshutsu・konkyo・insatsu_page・iken・basho・notes）にする。"""
     out = []
-    bango_keys = {}
+    bango_rows = {}
     for kind, val, pos, k, dist, end in refs:
         if kind not in ('bango', 'bango_far'):
             continue
@@ -640,30 +636,38 @@ def speech_rows(c, ik, nendo, dk, mid, sid, allb, qs):
                         else '迷う：丸数字があるが「意見書」「監査」の字が無い')
         elif dist > NEAR:
             note.append(f'迷う：丸数字が「意見書」「監査」の字から{dist}字離れている')
-        if not key:
-            note.append(f'迷う：一般会計のまとめに番号 {val} の意見が無い')
-        out.append({'hikikata': 'bango', 'konkyo': k, 'iken': key, 'notes': note, 'pos': pos})
+        ins = ''
         if key:
-            bango_keys[key] = out[-1]
+            r = ik.rows[key]
+            ins = str(r['ins_from'])
+            if r['ins_from'] != r['ins_to']:
+                note.append(f"意見の行は印刷のページ {r['ins_from']}〜{r['ins_to']} にまたがる")
+        else:
+            note.append(f'迷う：一般会計のまとめに番号 {val} の意見が無い')
+        o = {'hikikata': 'bango', 'kyoshutsu': who, 'konkyo': k, 'insatsu_page': ins, 'iken': key,
+             'basho': 'iken', 'notes': note, 'pos': pos, 'sid': sid}
+        out.append(o)
+        if key:
+            bango_rows[key] = o
     pages = [r for r in refs if r[0] == 'page']
     for i, (kind, val, pos, k, dist, end) in enumerate(pages):
         keys = ik.on_page(nendo, val)
-        hit = [bk for bk in bango_keys if bk in keys]
+        hit = [bk for bk in bango_rows if bk in keys]
         if hit:
-            bango_keys[hit[0]]['notes'].append(f'印刷のページ {val}（{k}）も同じ意見の行にかかる')
+            bango_rows[hit[0]]['notes'].append(f'印刷のページ {val}（{k}）も同じ意見の行にかかる')
             continue
         note = list(dbt)
         if dist > NEAR:
             note.append(f'迷う：ページの字が「意見書」「監査」の字から{dist}字離れている')
+        base = {'hikikata': 'page', 'kyoshutsu': who, 'konkyo': k, 'insatsu_page': str(val), 'pos': pos, 'sid': sid}
         if len(keys) == 1:
-            out.append({'hikikata': 'page', 'konkyo': k, 'iken': keys[0], 'notes': note, 'pos': pos})
+            out.append({**base, 'iken': keys[0], 'basho': 'iken', 'notes': note})
             continue
         if not keys:
-            note.append(f'印刷のページ {val} にかかる意見の行が無い（まとめ・節の外のページ）')
-            out.append({'hikikata': 'page', 'konkyo': k, 'iken': '', 'notes': note, 'pos': pos})
+            m = ik.midashi(nendo, val)
+            note.append(('見出し：' + m) if m else '見出しの字を読めない')
+            out.append({**base, 'iken': '', 'basho': 'hyo', 'notes': note})
             continue
-        # ページに意見の行が2行以上：ページの字の後ろ（次のページの字まで、WINDOW 字まで）の「」の字が、
-        # どの行の字にあるかで当てる
         stop = min([p[2] for p in pages[i + 1:]] + [end + WINDOW])
         found = []
         for q, qpos, raw in quotes_after(t, end, stop):
@@ -672,31 +676,107 @@ def speech_rows(c, ik, nendo, dk, mid, sid, allb, qs):
                 found.append((hits[0], q, qpos, raw))
         if not found:
             note.append(f'迷う：印刷のページ {val} にかかる意見の行が{len(keys)}行ある（' + '・'.join(keys) + '）')
-            out.append({'hikikata': 'page', 'konkyo': k, 'iken': '', 'notes': note, 'pos': pos})
+            out.append({**base, 'iken': '', 'basho': 'iken', 'notes': note})
             continue
         for j, (key, q, qpos, raw) in enumerate(found):
             kk = k if j == 0 else (raw[:KONKYO_MAX] if raw[:KONKYO_MAX] in t else q)
-            out.append({'hikikata': 'page', 'konkyo': kk, 'iken': key, 'pos': pos if j == 0 else qpos,
+            out.append({**base, 'konkyo': kk, 'iken': key, 'basho': 'iken', 'pos': pos if j == 0 else qpos,
                         'notes': note + [f'印刷のページ {val} にかかる意見の行{len(keys)}行のうち、'
                                          f'ページの字の後ろの「」の最初の{len(q)}字が意見の字にある行']})
-    if not out:
-        a0 = next((x for x in anchors if '意見書' in x[2]), anchors[0] if anchors else None)
-        if a0 is not None:
-            out.append({'hikikata': 'go', 'konkyo': a0[2][-KONKYO_MAX:], 'iken': '', 'notes': list(dbt), 'pos': a0[0]})
-        elif KW.search(t):
-            m = KW.search(t)
-            out.append({'hikikata': 'go', 'konkyo': m.group(0), 'iken': '', 'notes': list(dbt), 'pos': m.start()})
-        else:
-            out.append({'hikikata': 'go', 'konkyo': '', 'iken': '', 'notes': ['答弁の発言に候補を拾う字が無い'], 'pos': 0})
-    for o in out:
-        o['notes'] = base_note + o['notes']
     return out
 
 
-def mkrow(nendo, sid, role, o):
-    return {'nendo': str(2018 + nendo), 'sid': sid, 'role': role, 'hikikata': o['hikikata'], 'konkyo': o['konkyo'],
-            'iken': o['iken'], 'status': 'candidate', 'reviewer': '', 'date_kakunin': '', '_notes': list(o['notes']),
-            '_pos': o['pos']}
+def build_yaritori(c, ik, nagare, log):
+    rows = []
+    excluded = []
+    stats = {'kw_chair': 0}
+    for nendo, (sep, dec) in NENDO.items():
+        doc = f'kessan-r{nendo}-ikensho'
+        allb = set(kessan_bills(c, nendo))
+        for r in nagare:
+            if r['nendo'] != str(2018 + nendo) or r['dankai'] not in DANKAI_YARITORI:
+                continue
+            mid, a, b = r['meeting'], r['sid_from'], r['sid_to']
+            stats['kw_chair'] += sum(1 for s in c.by_meeting[mid] if a <= s['sid'] <= b and s['role'] in CHAIR
+                                     and KW.search(s['text'].replace('\n', '')))
+            if r['dankai'] == 'shitsugi':
+                groups = yaritori_of(c, mid, a, b)
+            else:
+                groups = [[s, []] for s in c.by_meeting[mid] if a <= s['sid'] <= b and s['role'] not in CHAIR]
+            for q, ans in groups:
+                speakers = [(q, 'q')] + [(x, 'a') for x in ans]
+                kw = [(sp, who) for sp, who in speakers if KW.search(sp['text'].replace('\n', ''))]
+                if not kw:
+                    continue
+                qtext = c.text(q['sid'])
+                places, go_cands, hito = [], [], []
+                other_doubt = False
+                for sp, who in kw:
+                    t = c.text(sp['sid'])
+                    anchors, refs = find_refs(t)
+                    if is_hito_only(t, anchors) and not refs:
+                        hito.append(sp['sid'])
+                        continue
+                    dbt = [d for d in doubts(t, anchors, ctx=qtext if who == 'a' else '')
+                           if '人や役' not in d]
+                    dbt = ['迷う：別の意見書か（「意見書」の前後に決算・監査委員の字が無い）' if '別の意見書' in d else d
+                           for d in dbt]
+                    if dbt:
+                        other_doubt = True
+                    ps = place_rows(c, ik, nendo, who, sp['sid'], t, refs, dbt)
+                    places += ps
+                    if not ps:
+                        a0 = next((x for x in anchors if '意見書' in x[2]), None) or next(
+                            (x for x in anchors if not (x[2].startswith('監査委員') and HITO.search(t[max(0, x[0] - 6):x[1] + 8]))),
+                            anchors[0] if anchors else None)
+                        k = a0[2][-KONKYO_MAX:] if a0 else KW.search(t).group(0)
+                        go_cands.append({'hikikata': 'go', 'kyoshutsu': who, 'konkyo': k, 'insatsu_page': '',
+                                         'iken': '', 'basho': 'fumei', 'notes': list(dbt),
+                                         'pos': a0[0] if a0 else 0, 'sid': sp['sid']})
+                if not places and not go_cands:
+                    for sid in hito:
+                        excluded.append((sid, '「監査委員」が人や役を指す言い方だけで、意見書の箇所の字が無い'))
+                    continue
+                # 同じ箇所（同じ意見の行。意見の行が決まらないときは同じ印刷のページ）を2つ以上の発言が挙げていれば、
+                # 先の行（質問の行が先）にまとめる
+                merged = []
+                for o in sorted(places, key=lambda o: (o['kyoshutsu'] != 'q', o['sid'], o['pos'])):
+                    same = next((m for m in merged if (o['iken'] and m['iken'] == o['iken']) or
+                                 (not o['iken'] and m['insatsu_page'] and m['insatsu_page'] == o['insatsu_page'])), None)
+                    if same:
+                        same['notes'].append(('答弁' if o['kyoshutsu'] == 'a' else '質問') +
+                                             f"（{o['sid']}）も同じ箇所を挙げる（{o['konkyo']}）")
+                        continue
+                    merged.append(o)
+                if not merged:
+                    g = next((x for x in go_cands if x['kyoshutsu'] == 'q'), go_cands[0])
+                    merged = [g]
+                for o in merged:
+                    notes = []
+                    if r['dankai'] != 'shitsugi':
+                        notes.append(f"段階：{DANKAI_JI[r['dankai']]}")
+                    else:
+                        lp = ledger_parts(c, mid, q['sid'])
+                        lb = sorted({p['bill'] for _, p, _, _ in lp})
+                        if lb and not (set(lb) & allb):
+                            notes.append('質疑の台帳で決算の議案でない部分（' + '・'.join(lb) + '）の質問')
+                    if o['kyoshutsu'] == 'a':
+                        notes.append(f"答弁（{o['sid']}）が挙げた箇所")
+                    for sid in hito:
+                        notes.append(f'{sid} は「監査委員」が人を指す言い方だけ')
+                    rows.append({
+                        'nendo': str(2018 + nendo), 'doc': doc, 'sid_q': q['sid'],
+                        'sid_a': ';'.join(x['sid'] for x in ans), 'role_q': q['role'],
+                        'role_a': ';'.join(x['role'] for x in ans),
+                        'hikikata': o['hikikata'], 'kyoshutsu': o['kyoshutsu'], 'konkyo': o['konkyo'],
+                        'insatsu_page': o['insatsu_page'], 'iken': o['iken'], 'basho': o['basho'],
+                        'status': 'candidate', 'reviewer': '', 'date_kakunin': '',
+                        'note': '。'.join(dict.fromkeys(notes + o['notes'])),
+                        '_pos': (0 if o['kyoshutsu'] == 'q' else 1, o['sid'], o['pos'])})
+    rows.sort(key=lambda r: (r['nendo'], r['sid_q'], r.pop('_pos'), r['hikikata'], r['konkyo']))
+    log.update(stats)
+    log['excluded'] = excluded
+    return rows
 
 
 # ---------------------------------------------------------------- 人の印を保つ
@@ -769,9 +849,9 @@ def check_common(rows, cols, head, key, label, errs):
                 errs.append(f'{label} {k}: rejected なのに note が空')
 
 
-def check(c, ik, nagare, nh, hatsugen, hh, errs):
+def check(c, ik, nagare, nh, yaritori, yh, errs):
     check_common(nagare, NAGARE_COLS, nh, NAGARE_KEY, 'kessan-nagare', errs)
-    check_common(hatsugen, HATSUGEN_COLS, hh, HATSUGEN_KEY, 'iken-hatsugen', errs)
+    check_common(yaritori, YARITORI_COLS, yh, YARITORI_KEY, 'iken-yaritori', errs)
     if errs:
         return
     ranges = {}
@@ -814,41 +894,85 @@ def check(c, ik, nagare, nh, hatsugen, hh, errs):
         for x, y in zip(rs, rs[1:]):
             if not x[3] < y[2]:
                 errs.append(f'kessan-nagare: {x[4]} の範囲（〜{x[3]}）と {y[4]} の範囲（{y[2]}〜）の前後が正しくない')
-    # 意見を引いた発言
+    # 意見書を踏まえた質疑のやりとり
     rng = {}
     for r in nagare:
-        if r['dankai'] in ('shitsugi', 'hokoku', 'toron') and r['status'] != 'rejected':
-            rng.setdefault(r['nendo'], []).append((r['sid_from'], r['sid_to']))
-    for r in hatsugen:
-        k = (r['sid'], r['hikikata'], r['konkyo'])
-        if r['sid'] not in c.speech:
-            errs.append(f'iken-hatsugen {k}: sid が会議録に無い')
+        if r['dankai'] in DANKAI_YARITORI and r['status'] != 'rejected':
+            rng.setdefault(r['nendo'], []).append((r['dankai'], r['sid_from'], r['sid_to']))
+    for r in yaritori:
+        k = tuple(r[x] for x in YARITORI_KEY)
+        if r['sid_q'] not in c.speech:
+            errs.append(f'iken-yaritori {k}: sid_q が会議録に無い')
             continue
-        sp = c.speech[r['sid']]
-        if sp['role'] != r['role']:
-            errs.append(f'iken-hatsugen {k}: role {r["role"]!r} が会議録の {sp["role"]!r} と違う')
-        if not any(a <= r['sid'] <= b for a, b in rng.get(r['nendo'], [])):
-            errs.append(f'iken-hatsugen {k}: sid が流れの表のその年度の質疑・委員長報告・討論の範囲に無い')
+        q = c.speech[r['sid_q']]
+        nd = int(r['nendo']) - 2018
+        if nd not in NENDO or r['doc'] != f'kessan-r{nd}-ikensho':
+            errs.append(f'iken-yaritori {k}: nendo と doc が合わない')
+            continue
+        if q['role'] != r['role_q']:
+            errs.append(f'iken-yaritori {k}: role_q {r["role_q"]!r} が会議録の {q["role"]!r} と違う')
+        dk = [d for d, a, b in rng.get(r['nendo'], []) if a <= r['sid_q'] <= b]
+        if not dk:
+            errs.append(f'iken-yaritori {k}: sid_q が流れの表のその年度の質疑・委員長報告・討論の範囲に無い')
+            continue
+        sa = [x for x in r['sid_a'].split(';') if x]
+        ra = [x for x in r['role_a'].split(';') if x] if r['role_a'] else []
+        if dk[0] == 'shitsugi':
+            if not GIIN.fullmatch(q['role']):
+                errs.append(f'iken-yaritori {k}: 質疑の sid_q が議員の発言でない')
+            mid = q['meetingId']
+            exp = []
+            for s in c.by_meeting[mid][c.pos[mid][r['sid_q']] + 1:]:
+                if s['role'] in CHAIR:
+                    continue
+                if GIIN.fullmatch(s['role']):
+                    break
+                exp.append(s['sid'])
+            if sa != exp:
+                errs.append(f'iken-yaritori {k}: sid_a が、質問の直後に続く答弁者の発言（{len(exp)}件）と違う')
+        elif sa:
+            errs.append(f'iken-yaritori {k}: 委員長報告・討論の行に sid_a がある')
+        if len(ra) != len(sa) or any(x not in c.speech or c.speech[x]['role'] != y for x, y in zip(sa, ra)):
+            errs.append(f'iken-yaritori {k}: role_a が sid_a の発言の役職と合わない')
         if r['hikikata'] not in HIKIKATA:
-            errs.append(f'iken-hatsugen {k}: hikikata が {r["hikikata"]!r}')
+            errs.append(f'iken-yaritori {k}: hikikata が {r["hikikata"]!r}')
+        if r['kyoshutsu'] not in KYOSHUTSU or (r['kyoshutsu'] == 'a' and not sa):
+            errs.append(f'iken-yaritori {k}: kyoshutsu が {r["kyoshutsu"]!r}')
+        if r['basho'] not in BASHO:
+            errs.append(f'iken-yaritori {k}: basho が {r["basho"]!r}')
         if len(r['konkyo']) > KONKYO_MAX:
-            errs.append(f'iken-hatsugen {k}: konkyo が{KONKYO_MAX}字を超える')
-        if r['konkyo'] and r['konkyo'] not in c.text(r['sid']):
-            errs.append(f'iken-hatsugen {k}: konkyo が発言の字に無い')
+            errs.append(f'iken-yaritori {k}: konkyo が{KONKYO_MAX}字を超える')
+        src = [r['sid_q']] if r['kyoshutsu'] == 'q' else [x for x in sa if x in c.speech]
+        if not r['konkyo'] or not any(r['konkyo'] in c.text(x) for x in src):
+            errs.append(f'iken-yaritori {k}: konkyo が、挙げた側の発言の字に無い')
+        ins = r['insatsu_page']
+        if r['hikikata'] == 'go':
+            if ins or r['iken'] or r['basho'] != 'fumei':
+                errs.append(f'iken-yaritori {k}: go の行に insatsu_page・iken があるか、basho が fumei でない')
+        else:
+            if r['basho'] == 'fumei':
+                errs.append(f'iken-yaritori {k}: {r["hikikata"]} の行の basho が fumei')
+            if r['hikikata'] == 'page':
+                m = PAGE.search(r['konkyo'])
+                if not ins or not m or int(m.group(1).translate(ZEN)) != int(ins):
+                    if not (m is None and r['iken']):   # 2つめ以降の「」で当てた行は konkyo にページが無い
+                        errs.append(f'iken-yaritori {k}: insatsu_page が konkyo のページと違う')
+            if r['hikikata'] == 'bango' and r['iken'] and ins != str(ik.rows.get(r['iken'], {}).get('ins_from', '')):
+                errs.append(f'iken-yaritori {k}: insatsu_page が意見の行の印刷のページと違う')
         if r['iken']:
             row = ik.rows.get(r['iken'])
-            nd = int(r['nendo']) - 2018
             if row is None:
-                errs.append(f'iken-hatsugen {k}: iken {r["iken"]} が意見の表に無い')
-            elif row['doc'] != f'kessan-r{nd}-ikensho':
-                errs.append(f'iken-hatsugen {k}: iken {r["iken"]} が年度 {r["nendo"]} の意見書でない')
-            elif r['hikikata'] == 'bango' and r['konkyo'] and (not row['bango'] or row['bango'] not in r['konkyo']):
-                errs.append(f'iken-hatsugen {k}: 番号 {row["bango"]} が konkyo に無い')
-            elif r['hikikata'] == 'page' and r['konkyo']:
-                m = PAGE.search(r['konkyo'])
-                pg = int(m.group(1).translate(ZEN)) if m else None
-                if pg is None or row.get('ins_from') is None or not (row['ins_from'] <= pg <= row['ins_to']):
-                    errs.append(f'iken-hatsugen {k}: konkyo のページが意見の行の印刷のページ（{row.get("ins_from")}〜{row.get("ins_to")}）に無い')
+                errs.append(f'iken-yaritori {k}: iken {r["iken"]} が意見の表に無い')
+            elif row['doc'] != r['doc']:
+                errs.append(f'iken-yaritori {k}: iken {r["iken"]} がその年度の意見書でない')
+            elif r['basho'] != 'iken':
+                errs.append(f'iken-yaritori {k}: iken があるのに basho が iken でない')
+            elif ins and not (row['ins_from'] <= int(ins) <= row['ins_to']):
+                errs.append(f'iken-yaritori {k}: insatsu_page が意見の行の印刷のページ（{row["ins_from"]}〜{row["ins_to"]}）に無い')
+            elif r['hikikata'] == 'bango' and (not row['bango'] or row['bango'] not in r['konkyo']):
+                errs.append(f'iken-yaritori {k}: 番号 {row["bango"]} が konkyo に無い')
+        if r['basho'] == 'hyo' and (r['iken'] or not ins or ik.on_page(nd, int(ins))):
+            errs.append(f'iken-yaritori {k}: hyo の行のページに意見の行がかかるか、iken がある')
 
 
 # ---------------------------------------------------------------- 材料の版
@@ -900,14 +1024,14 @@ def main(argv=None):
         if set(now) != {(x['repo'], x['path']) for x in rec}:
             errs.append('読んだ材料のファイルが inputs.json の一覧と違う')
         nagare, nh = read_tsv(NAGARE)
-        hatsugen, hh = read_tsv(HATSUGEN)
-        check(c, ik, nagare, nh, hatsugen, hh, errs)
+        yaritori, yh = read_tsv(YARITORI)
+        check(c, ik, nagare, nh, yaritori, yh, errs)
         if errs:
             for e in errs:
                 print(e, file=sys.stderr)
             print(f'合わない {len(errs)} 件', file=sys.stderr)
             sys.exit(1)
-        print(f'確かめた: 流れの表 {len(nagare)} 行、意見を引いた発言の表 {len(hatsugen)} 行。合わないもの 0 件')
+        print(f'確かめた: 流れの表 {len(nagare)} 行、意見書を踏まえた質疑のやりとりの表 {len(yaritori)} 行。合わないもの 0 件')
         return
 
     log = {}
@@ -917,25 +1041,28 @@ def main(argv=None):
               + ('proceedings.json の場面と同じ' if same else '違う'))
     if any(not s for _, s in log['agree']):
         die('場面の無い会議のための決め方が、場面のある年度で合いません')
-    hatsugen = build_hatsugen(c, ik, nagare, log)
+    yaritori = build_yaritori(c, ik, nagare, log)
     print(f'候補を拾う字を含む議長の発言（候補にしない）: {log["kw_chair"]} 件')
+    print(f'外した発言（表に入れない）: {len(log["excluded"])} 件')
+    for sid, why in log['excluded']:
+        print(f'  {sid}\t{why}')
     LINKS.mkdir(parents=True, exist_ok=True)
     old_n = read_tsv_rows(NAGARE) if NAGARE.exists() else []
-    old_h = read_tsv_rows(HATSUGEN) if HATSUGEN.exists() else []
+    old_h = read_tsv_rows(YARITORI) if YARITORI.exists() else []
     nagare = merge(nagare, old_n, NAGARE_KEY, NAGARE_TOOL, 'kessan-nagare')
-    hatsugen = merge(hatsugen, old_h, HATSUGEN_KEY, HATSUGEN_TOOL, 'iken-hatsugen')
+    yaritori = merge(yaritori, old_h, YARITORI_KEY, YARITORI_TOOL, 'iken-yaritori')
     nagare.sort(key=lambda r: (r['nendo'], DANKAI.index(r['dankai']), int(r['n'])))
-    check(c, ik, nagare, NAGARE_COLS, hatsugen, HATSUGEN_COLS, errs)
+    check(c, ik, nagare, NAGARE_COLS, yaritori, YARITORI_COLS, errs)
     if errs:
         for e in errs:
             print(e, file=sys.stderr)
         die(f'作った表が合いません（{len(errs)} 件）。書き出しません')
     write_tsv(NAGARE, NAGARE_COLS, nagare)
-    write_tsv(HATSUGEN, HATSUGEN_COLS, hatsugen)
+    write_tsv(YARITORI, YARITORI_COLS, yaritori)
     INPUTS.write_text(json.dumps({
         'note': 'tools/build_links.py が読んだ材料。画面に組み込むときに inputs.lock.json へ移す（DESIGN.md ADR-9）。',
         'inputs': inputs_now(docs, council, ik, c)}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    print(f'書いた: {NAGARE.relative_to(ROOT)} {len(nagare)} 行、{HATSUGEN.relative_to(ROOT)} {len(hatsugen)} 行')
+    print(f'書いた: {NAGARE.relative_to(ROOT)} {len(nagare)} 行、{YARITORI.relative_to(ROOT)} {len(yaritori)} 行')
 
 
 if __name__ == '__main__':

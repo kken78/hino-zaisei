@@ -137,30 +137,62 @@ class TestCueStages(unittest.TestCase):
 
 
 def row(**kw):
-    base = {c: '' for c in bl.HATSUGEN_COLS}
+    base = {c: '' for c in bl.YARITORI_COLS}
     base.update(status='candidate')
     base.update(kw)
     return base
 
 
+class TestYaritoriOf(unittest.TestCase):
+    def test_groups(self):
+        m = '0000000006'
+        ss = [
+            sp(f'{m}_20250911_0001', '2番', '質問。意見書の３ページ'),
+            sp(f'{m}_20250911_0002', '議長', '総務主監。'),
+            sp(f'{m}_20250911_0003', '総務主監', '答弁'),
+            sp(f'{m}_20250911_0004', '議長', '税務課長。'),
+            sp(f'{m}_20250911_0005', '税務課長', '答弁'),
+            sp(f'{m}_20250911_0006', '2番', '再質問'),
+            sp(f'{m}_20250911_0007', '総務主監', '答弁'),
+            sp(f'{m}_20250911_0008', '3番', '次の議員'),
+        ]
+        c = FakeCouncil(ss)
+        g = bl.yaritori_of(c, m, ss[0]['sid'], ss[6]['sid'])
+        got = [(q['sid'][-4:], [a['sid'][-4:] for a in ans]) for q, ans in g]
+        self.assertEqual(got, [('0001', ['0003', '0005']), ('0006', ['0007'])])
+
+
+class TestMidashi(unittest.TestCase):
+    def test_midashi(self):
+        ik = bl.Iken.__new__(bl.Iken)
+        ik.rows = {}
+        text = ('表紙\n1\n\f１．一般会計\n１．決算の概要\n93.6\n2\n\f２．歳入決算について\n本文\n3\n'
+                '\f表の続き\n99.0\n4\n')
+        ik._pages('kessan-r6-ikensho', text)
+        self.assertEqual(ik.midashi(6, 2), '１．一般会計／１．決算の概要')
+        self.assertEqual(ik.midashi(6, 3), '１．決算の概要／２．歳入決算について')  # 20字を超えるので章を除く
+        self.assertEqual(ik.midashi(6, 4), '１．一般会計／２．歳入決算について')
+        self.assertEqual(ik.midashi(6, 9), '')
+
+
 class TestMerge(unittest.TestCase):
     def test_keep_human(self):
-        key, tool = bl.HATSUGEN_KEY, bl.HATSUGEN_TOOL
+        key, tool = bl.YARITORI_KEY, bl.YARITORI_TOOL
         old = [
-            row(sid='s1', hikikata='go', konkyo='意見書', iken='doc/matome/ippan/2', status='candidate'),
-            row(sid='s2', hikikata='bango', konkyo='⑦', iken='doc/matome/ippan/8', status='confirmed',
+            row(sid_q='s1', kyoshutsu='q', hikikata='go', konkyo='意見書', iken='doc/matome/ippan/2', status='candidate'),
+            row(sid_q='s2', kyoshutsu='a', hikikata='bango', konkyo='⑦', iken='doc/matome/ippan/8', status='confirmed',
                 reviewer='kken78', date_kakunin='2026-11-13', note='確かめた'),
-            row(sid='s3', hikikata='go', konkyo='監査委員', status='rejected', reviewer='kken78',
+            row(sid_q='s3', kyoshutsu='q', hikikata='go', konkyo='監査委員', status='rejected', reviewer='kken78',
                 date_kakunin='2026-11-13', note='人を指す'),
-            row(sid='s4', hikikata='go', konkyo='意見書', status='candidate', note='古い候補'),
+            row(sid_q='s4', kyoshutsu='q', hikikata='go', konkyo='意見書', status='candidate', note='古い候補'),
         ]
         new = [
-            row(sid='s1', hikikata='go', konkyo='意見書', iken='', note='新しい注記'),
-            row(sid='s2', hikikata='bango', konkyo='⑦', iken='doc/matome/ippan/8', note='道具の注記'),
-            row(sid='s5', hikikata='page', konkyo='3ページ'),
+            row(sid_q='s1', kyoshutsu='q', hikikata='go', konkyo='意見書', iken='', note='新しい注記'),
+            row(sid_q='s2', kyoshutsu='a', hikikata='bango', konkyo='⑦', iken='doc/matome/ippan/8', note='道具の注記'),
+            row(sid_q='s5', kyoshutsu='q', hikikata='page', konkyo='3ページ'),
         ]
         out = bl.merge(copy.deepcopy(new), old, key, tool, 'test')
-        by = {r['sid']: r for r in out}
+        by = {r['sid_q']: r for r in out}
         self.assertEqual(by['s1']['iken'], 'doc/matome/ippan/2')   # 人が書いた値を保つ
         self.assertEqual(by['s1']['note'], '新しい注記')            # 候補の注記は作り直す
         self.assertEqual(by['s2']['note'], '確かめた')              # 人の印の行はそのまま
@@ -169,9 +201,9 @@ class TestMerge(unittest.TestCase):
         self.assertIn('s5', by)
 
     def test_idempotent(self):
-        new = [row(sid='s1', hikikata='go', konkyo='意見書')]
-        once = bl.merge(copy.deepcopy(new), [], bl.HATSUGEN_KEY, bl.HATSUGEN_TOOL, 'a')
-        twice = bl.merge(copy.deepcopy(new), once, bl.HATSUGEN_KEY, bl.HATSUGEN_TOOL, 'b')
+        new = [row(sid_q='s1', kyoshutsu='q', hikikata='go', konkyo='意見書')]
+        once = bl.merge(copy.deepcopy(new), [], bl.YARITORI_KEY, bl.YARITORI_TOOL, 'a')
+        twice = bl.merge(copy.deepcopy(new), once, bl.YARITORI_KEY, bl.YARITORI_TOOL, 'b')
         self.assertEqual(once, twice)
 
 
@@ -183,18 +215,23 @@ class TestCheck(unittest.TestCase):
         bl.NENDO.clear()
         bl.NENDO[6] = ('0000000006', '0000000012')
         sep, dec = bl.NENDO[6]
+        self.q = f'{sep}_20250911_0001'
+        self.a1, self.a2 = f'{sep}_20250911_0003', f'{sep}_20250911_0004'
         ss = [
             sp(f'{sep}_20250901_0001', '代表監査委員', '審査の結果'),
-            sp(f'{sep}_20250911_0001', '8番', '監査委員さんの意見書の20ページの中段、⑦のほう'),
-            sp(f'{sep}_20250911_0002', '総務課長', 'お答えします'),
-            sp(f'{dec}_20251201_0001', '9番', '委員長報告'),
+            sp(self.q, '8番', '決算審査意見書の３ページの表と、⑦のほう'),
+            sp(f'{sep}_20250911_0002', '議長', '厚生主監。'),
+            sp(self.a1, '厚生主監', '監査委員さんの意見書の20ページの中段'),
+            sp(self.a2, '総務主監', 'お答えします'),
+            sp(f'{sep}_20250911_0005', '9番', '次の質問'),
+            sp(f'{dec}_20251201_0001', '9番', '委員長報告。決算審査意見書'),
             sp(f'{dec}_20251201_0002', '議長', '起立多数であります。'),
         ]
         self.c = FakeCouncil(ss, gian={sep: {'agenda': [{'no': '議第68号', 'kind': '決算'}]}})
         self.ik = types.SimpleNamespace(rows={
             'kessan-r6-ikensho/matome/kaigo/1': {'doc': 'kessan-r6-ikensho', 'bango': '', 'ins_from': 20, 'ins_to': 20},
             'kessan-r6-ikensho/matome/ippan/8': {'doc': 'kessan-r6-ikensho', 'bango': '⑦', 'ins_from': 10, 'ins_to': 10},
-        })
+        }, on_page=lambda nd, pg: [k for k, r in self.ik.rows.items() if r['ins_from'] <= pg <= r['ins_to']])
 
         def nr(dankai, n, mid, a, b, date, gian='議第68号', kekka='', hoho=''):
             r = {c: '' for c in bl.NAGARE_COLS}
@@ -203,26 +240,30 @@ class TestCheck(unittest.TestCase):
             return r
         self.nagare = [
             nr('kansa', 1, sep, f'{sep}_20250901_0001', f'{sep}_20250901_0001', '2025-09-01'),
-            nr('shitsugi', 1, sep, f'{sep}_20250911_0001', f'{sep}_20250911_0002', '2025-09-11'),
+            nr('shitsugi', 1, sep, self.q, f'{sep}_20250911_0005', '2025-09-11'),
             nr('hokoku', 1, dec, f'{dec}_20251201_0001', f'{dec}_20251201_0001', '2025-12-01'),
             nr('saiketsu', 1, dec, f'{dec}_20251201_0002', f'{dec}_20251201_0002', '2025-12-01', kekka='認定', hoho='起立多数'),
         ]
-        self.hatsugen = [
-            row(nendo='2024', sid=f'{sep}_20250911_0001', role='8番', hikikata='page', konkyo='意見書の20ページ',
-                iken='kessan-r6-ikensho/matome/kaigo/1'),
-            row(nendo='2024', sid=f'{sep}_20250911_0001', role='8番', hikikata='bango', konkyo='⑦',
-                iken='kessan-r6-ikensho/matome/ippan/8'),
-            row(nendo='2024', sid=f'{sep}_20250911_0002', role='総務課長', hikikata='go', konkyo='', iken=''),
+        common = dict(nendo='2024', doc='kessan-r6-ikensho', sid_q=self.q, sid_a=f'{self.a1};{self.a2}',
+                      role_q='8番', role_a='厚生主監;総務主監')
+        self.yaritori = [
+            row(**common, hikikata='page', kyoshutsu='q', konkyo='意見書の３ページ', insatsu_page='3', basho='hyo'),
+            row(**common, hikikata='bango', kyoshutsu='q', konkyo='⑦', insatsu_page='10',
+                iken='kessan-r6-ikensho/matome/ippan/8', basho='iken'),
+            row(**common, hikikata='page', kyoshutsu='a', konkyo='意見書の20ページ', insatsu_page='20',
+                iken='kessan-r6-ikensho/matome/kaigo/1', basho='iken'),
+            row(nendo='2024', doc='kessan-r6-ikensho', sid_q=f'{dec}_20251201_0001', role_q='9番', hikikata='go',
+                kyoshutsu='q', konkyo='決算審査意見書', basho='fumei', note='段階：委員長報告'),
         ]
 
     def tearDown(self):
         bl.NENDO.clear()
         bl.NENDO.update(self.saved)
 
-    def run_check(self, nagare=None, hatsugen=None):
+    def run_check(self, nagare=None, yaritori=None):
         errs = []
-        bl.check(self.c, self.ik, nagare or self.nagare, bl.NAGARE_COLS, hatsugen or self.hatsugen,
-                 bl.HATSUGEN_COLS, errs)
+        bl.check(self.c, self.ik, nagare or self.nagare, bl.NAGARE_COLS, yaritori or self.yaritori,
+                 bl.YARITORI_COLS, errs)
         return errs
 
     def test_ok(self):
@@ -233,33 +274,43 @@ class TestCheck(unittest.TestCase):
         n[i].update(kw)
         return self.run_check(nagare=n)
 
-    def bad_h(self, i, **kw):
-        h = copy.deepcopy(self.hatsugen)
-        h[i].update(kw)
-        return self.run_check(hatsugen=h)
+    def bad_y(self, i, **kw):
+        y = copy.deepcopy(self.yaritori)
+        y[i].update(kw)
+        return self.run_check(yaritori=y)
 
     def test_errors(self):
         sep = bl.NENDO[6][0]
         cases = {
             'sid が会議録に無い': self.bad_n(1, sid_to=f'{sep}_20250911_0009'),
-            '前後（from が to より後）': self.bad_n(1, sid_from=f'{sep}_20250911_0002', sid_to=f'{sep}_20250911_0001'),
+            '前後（from が to より後）': self.bad_n(1, sid_from=f'{sep}_20250911_0005', sid_to=self.q),
             '段階の前後': self.bad_n(0, dankai='hokoku'),
             'date': self.bad_n(1, date='2025-09-12'),
             '議案': self.bad_n(1, gian='議第99号'),
             '採決の kekka': self.bad_n(3, kekka=''),
             'status': self.bad_n(0, status='ok'),
             'confirmed の reviewer': self.bad_n(0, status='confirmed'),
-            '発言の sid': self.bad_h(0, sid=f'{sep}_20250911_0009'),
-            '範囲の外': self.bad_h(0, sid=f'{sep}_20250901_0001', role='代表監査委員'),
-            'role': self.bad_h(0, role='7番'),
-            'iken のキー': self.bad_h(0, iken='kessan-r6-ikensho/matome/kaigo/9'),
-            'iken の年度': self.bad_h(0, nendo='2023'),
-            'konkyo が発言に無い': self.bad_h(0, konkyo='意見書の21ページ'),
-            'ページが行にかからない': self.bad_h(0, iken='kessan-r6-ikensho/matome/ippan/8'),
-            '番号が konkyo に無い': self.bad_h(1, iken='kessan-r6-ikensho/matome/kaigo/1', hikikata='bango'),
-            'hikikata': self.bad_h(2, hikikata='x'),
-            'rejected の note': self.bad_h(2, status='rejected', reviewer='kken78', date_kakunin='2026-11-13'),
-            'キーの重複': self.run_check(hatsugen=self.hatsugen + [copy.deepcopy(self.hatsugen[0])]),
+            'sid_q が会議録に無い': self.bad_y(0, sid_q=f'{sep}_20250911_0009'),
+            '範囲の外': self.bad_y(0, sid_q=f'{sep}_20250901_0001', role_q='代表監査委員'),
+            'role_q': self.bad_y(0, role_q='7番'),
+            'sid_a の抜け': self.bad_y(0, sid_a=self.a1, role_a='厚生主監'),
+            'role_a': self.bad_y(0, role_a='総務主監;厚生主監'),
+            '委員長報告の sid_a': self.bad_y(3, sid_a=self.a1, role_a='厚生主監'),
+            'iken のキー': self.bad_y(1, iken='kessan-r6-ikensho/matome/kaigo/9'),
+            'doc の年度': self.bad_y(1, doc='kessan-r5-ikensho'),
+            'konkyo が発言に無い': self.bad_y(0, konkyo='意見書の21ページ'),
+            '挙げた側が違う': self.bad_y(2, kyoshutsu='q'),
+            'insatsu_page とページ': self.bad_y(0, insatsu_page='4'),
+            'ページが行にかからない': self.bad_y(2, iken='kessan-r6-ikensho/matome/ippan/8'),
+            '番号の insatsu_page': self.bad_y(1, insatsu_page='11'),
+            '番号が konkyo に無い': self.bad_y(1, iken='kessan-r6-ikensho/matome/kaigo/1', insatsu_page='20'),
+            'hyo に意見の行': self.bad_y(2, basho='hyo', iken=''),
+            'iken で basho が hyo': self.bad_y(1, basho='hyo'),
+            'go の basho': self.bad_y(3, basho='hyo'),
+            'hikikata': self.bad_y(3, hikikata='x'),
+            'kyoshutsu': self.bad_y(3, kyoshutsu='a'),
+            'rejected の note': self.bad_y(0, status='rejected', reviewer='kken78', date_kakunin='2026-11-13'),
+            'キーの重複': self.run_check(yaritori=self.yaritori + [copy.deepcopy(self.yaritori[0])]),
         }
         for name, errs in cases.items():
             with self.subTest(name):
@@ -270,10 +321,10 @@ class TestTsv(unittest.TestCase):
     def test_roundtrip(self):
         with tempfile.TemporaryDirectory() as d:
             p = pathlib.Path(d) / 'a.tsv'
-            rows = [row(sid='s1', hikikata='go', konkyo='意見書')]
-            bl.write_tsv(p, bl.HATSUGEN_COLS, rows)
+            rows = [row(sid_q='s1', kyoshutsu='q', hikikata='go', konkyo='意見書')]
+            bl.write_tsv(p, bl.YARITORI_COLS, rows)
             got, head = bl.read_tsv(p)
-            self.assertEqual(head, bl.HATSUGEN_COLS)
+            self.assertEqual(head, bl.YARITORI_COLS)
             self.assertEqual(got, rows)
 
     def test_tab_in_value_stops(self):
