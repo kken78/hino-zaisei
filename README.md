@@ -19,8 +19,8 @@ https://kken78.github.io/hino-zaisei/
 | `data.js` | 材料から作る画面用のファイル。直接編集しない |
 | `tools/build_data.py` | 材料を検算して `data.js` を作る（標準ライブラリのみ） |
 | `og.png`・`assets/og.svg` | OGP 画像（1200×630）と、その編集元 |
-| `data/links/kessan-nagare.tsv`・`iken-hatsugen.tsv`・`inputs.json` | 決算審査の議会での流れと、決算審査の意見を引いた発言のつなぎの表（候補。DESIGN.md ADR-9）と、読んだ材料の版。画面にはまだ使っていない |
-| `tools/build_links.py`・`tools/test_build_links.py` | つなぎの表の候補を作り、確かめる道具と、その検査（下の「決算審査の流れと意見を引いた発言（候補）」） |
+| `data/links/kessan-nagare.tsv`・`iken-yaritori.tsv`・`inputs.json` | 決算審査の議会での流れと、決算審査の意見書を踏まえた質疑のやりとりのつなぎの表（候補。DESIGN.md ADR-9）と、読んだ材料の版。画面にはまだ使っていない |
+| `tools/build_links.py`・`tools/test_build_links.py` | つなぎの表の候補を作り、確かめる道具と、その検査（下の「決算審査の流れと意見書を踏まえた質疑のやりとり（候補）」） |
 | `tools/watch.py`・`data/watch.tsv` | 町の予算のページの巡回（下の「町のページの巡回」）と、使っている原典12件（各年度の当初予算の概要・附表）の URL・bytes・sha256 |
 
 附表の材料はこのリポジトリに置かず、次の3つのリポジトリから読みます。
@@ -102,12 +102,12 @@ https://kken78.github.io/hino-zaisei/
 
 画面に載せるのは、各年度の附表の事業の key・柱・区分・款・事業名・概要・内訳・予算額（千円）・担当課・原典のページ、年度の台帳でつながる他の年度の事業、令和8年度については対応の台帳で confirmed の実施計画の事業（e番号と事業名）です。原典の文字は直しません（誤字と思われる箇所も含めそのまま）。担当課が2つ以上ある事業は、担当課別の表では「複数の課」の行に数えます（課ごとの金額の内訳が附表に無いため）。増減は、負の値に「△」を付け、正の値に印を付けません。表のセルでは「△」と数だけを書き、列の見出しに「△ は減」と書きます。カードと文では、向きを文言（増・減・同額・増減なし）でも示します。前の年度が無いなど、値の無いセルは空けます。色は付けません（hino-portal DESIGN.md 3.3）。
 
-## 決算審査の流れと意見を引いた発言（候補）
+## 決算審査の流れと意見書を踏まえた質疑のやりとり（候補）
 
-令和3〜6年度の決算について、意見書が議会を通る流れ（`data/links/kessan-nagare.tsv`）と、意見を引いた発言（`data/links/iken-hatsugen.tsv`）のつなぎの表を、[hino-council-search](https://github.com/kken78/hino-council-search) の会議録の公開データ（`public/data/`）と hino-town-docs の決算審査の意見の表（`data/struct/kessan-iken.tsv`）から作ります（DESIGN.md ADR-9）。道具が候補（status が candidate）を作り、依頼者が確かめた行を confirmed・rejected にします。画面にはまだ使っていません。
+令和3〜6年度の決算について、意見書が議会を通る流れ（`data/links/kessan-nagare.tsv`）と、意見書を踏まえた質疑のやりとり（`data/links/iken-yaritori.tsv`）のつなぎの表を、[hino-council-search](https://github.com/kken78/hino-council-search) の会議録の公開データ（`public/data/`）と hino-town-docs の決算審査の意見の表（`data/struct/kessan-iken.tsv`）から作ります（DESIGN.md ADR-9）。道具が候補（status が candidate）を作り、依頼者が確かめた行を confirmed・rejected にします。画面にはまだ使っていません。
 
 1. hino-town-docs と hino-council-search を、このリポジトリと同じフォルダに置く（別の場所なら `--src`・`--council` で指定する）。
-2. `python3 tools/build_links.py` で候補を作り直す。confirmed・rejected の行と、候補の行に人が書いた値（iken など）は保つ。読んだ材料の commit と sha256 を `data/links/inputs.json` に書く。
+2. `python3 tools/build_links.py` で候補を作り直す。confirmed・rejected の行と、候補の行に人が書いた値（iken など）は保つ。「監査委員」が人を指す言い方だけの発言は候補にせず、sid と理由を表示する。読んだ材料の commit と sha256 を `data/links/inputs.json` に書く。
 3. `python3 tools/build_links.py --check` で、表が指す sid が会議録にあること、iken のキーが意見の表にあること、範囲の前後、材料の sha256 を確かめる。合わなければ終了コード 1。
 4. `python3 -B tools/test_build_links.py` で道具の検査をする。
 
